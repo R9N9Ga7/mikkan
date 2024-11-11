@@ -17,7 +17,7 @@ public class HomePageTest : IntegrationTestBase
     [Fact]
     public async Task Get_Valid()
     {
-        var response = await Get("/");
+        var response = await Get("/api/home");
         response.EnsureSuccessStatusCode();
 
         var content = await DeserializeResponse<string>(response);
