@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Contexts;
+using Server.Mappers;
 
 namespace Server;
 
@@ -42,6 +43,8 @@ public class Program
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             options.UseSqlite(connectionString);
         });
+
+        services.AddAutoMapper(typeof(MapperProfile));
     }
 
     static void ConfigApp(WebApplication app)
