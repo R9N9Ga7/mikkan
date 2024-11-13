@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Server.Models.Entities;
 
 namespace Server.Contexts;
 
@@ -9,4 +10,6 @@ public class DatabaseContext : DbContext
     {
         Database.EnsureCreated();
     }
+
+    public DbSet<User> Users { get; set; } = null!;
 }

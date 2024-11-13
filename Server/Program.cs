@@ -1,12 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using Server.Contexts;
+using Server.Interfaces.Repositories;
+using Server.Interfaces.Services;
 using Server.Mappers;
+using Server.Repositories;
+using Server.Services;
+using Server.Settings;
 
 namespace Server;
 
-#pragma warning disable CA1052 // Static holder types should be Static or NotInheritable
 public class Program
-#pragma warning restore CA1052 // Static holder types should be Static or NotInheritable
 {
     public static void Main(string[] args)
     {
@@ -45,6 +48,12 @@ public class Program
         });
 
         services.AddAutoMapper(typeof(MapperProfile));
+
+        services.AddTransient<IUserRepository, UserRepository>();
+
+        services.AddTransient<IPasswordHasherService, PasswordHasherService>();
+
+        services.Configure<AccountSettings>(builder.Configuration.GetSection("AccountSettings"));
     }
 
     static void ConfigApp(WebApplication app)
