@@ -34,6 +34,19 @@ public class UserRepository : IUserRepository
         return user;
     }
 
+    public async Task<User> GetByUsername(string username)
+    {
+        var user = await _databaseContext.Users
+            .FirstOrDefaultAsync(u => u.Username == username);
+
+        if (user == null)
+        {
+            throw new UserNotFoundException();
+        }
+
+        return user;
+    }
+
     readonly DatabaseContext _databaseContext;
     readonly IPasswordHasherService _passwordHasherService;
 }
