@@ -17,10 +17,8 @@ public class UserRepository : IUserRepository
 
     public async Task<User> Create(User user)
     {
-        var findedUser = await _databaseContext.Users
-            .FirstOrDefaultAsync(u => u.Username == user.Username);
-
-        if (findedUser != null)
+        var isUserAlreadyExists = await Contains(user.Username);
+        if (isUserAlreadyExists)
         {
             throw new UserAlreadyExistsException();
         }
@@ -45,6 +43,13 @@ public class UserRepository : IUserRepository
         }
 
         return user;
+    }
+
+    public async Task<bool> Contains(string username)
+    {
+        var user = await _databaseContext.Users
+            .FirstOrDefaultAsync(u => u.Username == username);
+        return user != null;
     }
 
     readonly DatabaseContext _databaseContext;
