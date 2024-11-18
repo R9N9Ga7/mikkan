@@ -51,5 +51,5 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase>
         return service;
     }
 
-    readonly WebApplicationFactoryBase _factory;
+    readonly protected WebApplicationFactoryBase _factory;
 }

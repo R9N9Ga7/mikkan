@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Server;
 using Server.Contexts;
+using Server.Settings;
 
 namespace Tests.Factories;
 
@@ -21,11 +22,18 @@ public class WebApplicationFactoryBase : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureTestServices(services => {
-            services.RemoveAll(typeof(DbContextOptions<DatabaseContext>));
-
+            services.RemoveAll<DbContextOptions<DatabaseContext>>();
             services.AddDbContext<DatabaseContext>(options =>
             {
                 options.UseSqlite(_sqliteConnection);
+            });
+
+            services.Configure<AccountSettings>(options =>
+            {
+                options.SaltSize = 16;
+                options.KeySize = 32;
+                options.Iterations = 10000;
+                options.UserRegistrationsLimit = int.MaxValue;
             });
 
             var context = CreateDatabaseContext(services);

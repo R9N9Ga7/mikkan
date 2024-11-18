@@ -41,5 +41,11 @@ public class UserRepository : IUserRepository
         return isExists;
     }
 
+    public async Task<int> Count()
+    {
+        var count = await _databaseContext.Users.CountAsync();
+        return count;
+    }
+
     readonly DatabaseContext _databaseContext;
 }

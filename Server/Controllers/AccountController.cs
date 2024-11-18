@@ -29,6 +29,9 @@ public class AccountController
         } catch (UserAlreadyExistsException ex)
         {
             return Results.BadRequest(ex.Message);
+        } catch (UserRegistrationLimitException ex)
+        {
+            return Results.BadRequest(ex.Message);
         }
     }
 
