@@ -6,5 +6,5 @@ public interface IUserRepository
 {
     public Task<User> Create(User user);
     public Task<User> GetByUsername(string username);
-    public Task<bool> Contains(string username);
+    public Task<bool> IsExists(string username);
 }

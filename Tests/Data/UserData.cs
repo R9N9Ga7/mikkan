@@ -10,7 +10,7 @@ public class UserData
     {
         return new UserCreateRequest
         {
-            Username = "username",
+            Username = $"username-{Guid.NewGuid()}",
             Password = "password",
         };
     }

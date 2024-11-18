@@ -53,6 +53,8 @@ public class Program
 
         services.AddTransient<IPasswordHasherService, PasswordHasherService>();
 
+        services.AddTransient<IUserService, UserService>();
+
         services.Configure<AccountSettings>(builder.Configuration.GetSection("AccountSettings"));
     }
 

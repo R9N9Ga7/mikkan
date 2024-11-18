@@ -24,7 +24,7 @@ public class AccountControllerTest : IntegrationTestBase
         var response = await Post($"{Url}/create", userCreateRequest);
         response.EnsureSuccessStatusCode();
 
-        var isUserExists = await _userRepository.Contains(userCreateRequest.Username);
+        var isUserExists = await _userRepository.IsExists(userCreateRequest.Username);
         isUserExists.Should().BeTrue();
     }
 

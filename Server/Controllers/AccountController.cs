@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Server.Exceptions;
-using Server.Interfaces.Repositories;
+using Server.Interfaces.Services;
 using Server.Models.Entities;
 using Server.Models.Requests;
 
@@ -11,9 +11,9 @@ namespace Server.Controllers;
 [Route("api/[controller]")]
 public class AccountController
 {
-    public AccountController(IUserRepository userRepository, IMapper mapper)
+    public AccountController(IUserService userRepository, IMapper mapper)
     {
-        _userRepository = userRepository;
+        _userService = userRepository;
         _mapper = mapper;
     }
 
@@ -23,7 +23,7 @@ public class AccountController
         try
         {
             var user = _mapper.Map<User>(userCreateRequest);
-            await _userRepository.Create(user);
+            await _userService.Create(user);
 
             return Results.Created();
         } catch (UserAlreadyExistsException ex)
@@ -32,6 +32,6 @@ public class AccountController
         }
     }
 
-    readonly IUserRepository _userRepository;
+    readonly IUserService _userService;
     readonly IMapper _mapper;
 }
