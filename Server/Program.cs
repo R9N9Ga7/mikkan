@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Server.Contexts;
 using Server.Interfaces.Repositories;
@@ -41,6 +42,20 @@ public class Program
             });
         });
 
+        services.AddAuthorization();
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                var authSettings = builder.Configuration.GetSection("AuthSettings").Get<AuthSettings>();
+                if (authSettings == null)
+                {
+                    return;
+                }
+
+                var jwtKeyService = new JwtKeyService(authSettings);
+                options.TokenValidationParameters = jwtKeyService.GetTokenValidationParameters();
+            });
+
         services.AddDbContext<DatabaseContext>(options =>
         {
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -52,10 +67,12 @@ public class Program
         services.AddTransient<IUserRepository, UserRepository>();
 
         services.AddTransient<IPasswordHasherService, PasswordHasherService>();
+        services.AddTransient<IJwtKeyService, JwtKeyService>();
 
         services.AddTransient<IUserService, UserService>();
 
         services.Configure<AccountSettings>(builder.Configuration.GetSection("AccountSettings"));
+        services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
     }
 
     static void ConfigApp(WebApplication app)
