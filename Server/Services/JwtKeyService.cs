@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Server.Interfaces.Services;
 using Server.Settings;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,6 +13,11 @@ public class JwtKeyService : IJwtKeyService
     public JwtKeyService(AuthSettings authSettings)
     {
         _authSettings = authSettings;
+    }
+
+    public JwtKeyService(IOptions<AuthSettings> options)
+    {
+        _authSettings = options.Value;
     }
 
     public TokenValidationParameters GetTokenValidationParameters()

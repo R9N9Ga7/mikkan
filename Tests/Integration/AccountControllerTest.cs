@@ -1,10 +1,16 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Server.Interfaces.Repositories;
+using Server.Interfaces.Services;
 using Server.Models.Requests;
+using Server.Models.Responses;
 using Server.Settings;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using Tests.Common;
 using Tests.Data;
 using Tests.Factories;
@@ -17,6 +23,7 @@ public class AccountControllerTest : IntegrationTestBase
         : base(factory)
     {
         _userRepository = GetService<IUserRepository>();
+        _jwtKeyService = GetService<IJwtKeyService>();
     }
 
     [Fact]
@@ -40,7 +47,8 @@ public class AccountControllerTest : IntegrationTestBase
         response.EnsureSuccessStatusCode();
 
         var user = await _userRepository.GetByUsername(userCreateRequest.Username);
-        user.Password.Should().NotBe(userCreateRequest.Password);
+        user.Should().NotBeNull();
+        user?.Password.Should().NotBe(userCreateRequest.Password);
     }
 
     [Fact]
@@ -131,7 +139,56 @@ public class AccountControllerTest : IntegrationTestBase
         }
     }
 
+    [Fact]
+    public async Task LoginWithValidCredentials()
+    {
+        var userCreateRequest = UserData.GetUserCreateRequest();
+
+        var user = await Post($"{Url}/create", userCreateRequest);
+        user.EnsureSuccessStatusCode();
+
+        var loginResponse = await Post($"{Url}/login", userCreateRequest);
+        loginResponse.EnsureSuccessStatusCode();
+
+        var loginContent = await DeserializeResponse<UserLoginResponse>(loginResponse);
+        loginContent.Should().NotBeNull();
+        loginContent.AccessToken.Should().NotBeEmpty();
+        loginContent.RefreshToken.Should().NotBeEmpty();
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        {
+            var claimPrincipal = tokenHandler.ValidateToken(
+                loginContent.RefreshToken,
+                _jwtKeyService.GetTokenValidationParameters(),
+                out _);
+
+            claimPrincipal.HasClaim(ClaimTypes.Name, userCreateRequest.Username).Should().BeTrue();
+        }
+
+        {
+            var claimPrincipal = tokenHandler.ValidateToken(
+                loginContent.AccessToken,
+                _jwtKeyService.GetTokenValidationParameters(),
+                out _);
+
+            claimPrincipal.HasClaim(ClaimTypes.Name, userCreateRequest.Username).Should().BeTrue();
+        }
+    }
+
+    [Fact]
+    public async Task LoginWithInvalidCredentials()
+    {
+        var userCreateRequest = new UserCreateRequest {
+            Username = "WrongUsername",
+            Password = "WrongPassword",
+        };
+        var loginResponse = await Post($"{Url}/login", userCreateRequest);
+        loginResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
     const string Url = "/api/account";
 
     readonly IUserRepository _userRepository;
+    readonly IJwtKeyService _jwtKeyService;
 }

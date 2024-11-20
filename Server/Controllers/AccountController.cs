@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Exceptions;
 using Server.Interfaces.Services;
 using Server.Models.Entities;
 using Server.Models.Requests;
+using Server.Models.Responses;
 
 namespace Server.Controllers;
 
@@ -26,12 +28,34 @@ public class AccountController
             await _userService.Create(user);
 
             return Results.Created();
-        } catch (UserAlreadyExistsException ex)
+        }
+        catch (UserAlreadyExistsException ex)
         {
             return Results.BadRequest(ex.Message);
-        } catch (UserRegistrationLimitException ex)
+        }
+        catch (UserRegistrationLimitException ex)
         {
             return Results.BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("login")]
+    public async Task<IResult> Login(UserLoginRequest userLoginRequest)
+    {
+        try
+        {
+            var user = _mapper.Map<User>(userLoginRequest);
+            var userLoginDto = await _userService.Login(user);
+            var userLoginResponse = _mapper.Map<UserLoginResponse>(userLoginDto);
+            return Results.Json(userLoginResponse);
+        }
+        catch (UserNotFoundException _)
+        {
+            return Results.Unauthorized();
+        }
+        catch (UserInvalidPasswordException _)
+        {
+            return Results.Unauthorized();
         }
     }
 
