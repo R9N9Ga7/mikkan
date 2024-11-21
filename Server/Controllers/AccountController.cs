@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Exceptions;
 using Server.Interfaces.Services;
+using Server.Models.Dtos;
 using Server.Models.Entities;
 using Server.Models.Requests;
 using Server.Models.Responses;
@@ -45,15 +45,31 @@ public class AccountController
         try
         {
             var user = _mapper.Map<User>(userLoginRequest);
-            var userLoginDto = await _userService.Login(user);
-            var userLoginResponse = _mapper.Map<UserLoginResponse>(userLoginDto);
-            return Results.Json(userLoginResponse);
+            var userTokensDto = await _userService.Login(user);
+            var userTokensResponse = _mapper.Map<UserTokensResponse>(userTokensDto);
+            return Results.Json(userTokensResponse);
         }
-        catch (UserNotFoundException _)
+        catch (UserNotFoundException)
         {
             return Results.Unauthorized();
         }
-        catch (UserInvalidPasswordException _)
+        catch (UserInvalidPasswordException)
+        {
+            return Results.Unauthorized();
+        }
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IResult> Refresh(UserTokensRequest userTokensRequest)
+    {
+        try
+        {
+            var userTokensDto = _mapper.Map<UserTokensDto>(userTokensRequest);
+            var refreshedTokensDto = await _userService.RefreshTokens(userTokensDto);
+            var userTokensResponse = _mapper.Map<UserTokensResponse>(userTokensDto);
+            return Results.Json(userTokensResponse);
+        }
+        catch (UserUnauthorizedException)
         {
             return Results.Unauthorized();
         }

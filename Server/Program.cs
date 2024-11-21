@@ -52,8 +52,8 @@ public class Program
                     return;
                 }
 
-                var jwtKeyService = new JwtKeyService(authSettings);
-                options.TokenValidationParameters = jwtKeyService.GetTokenValidationParameters();
+                var tokenService = new TokenService(authSettings);
+                options.TokenValidationParameters = tokenService.GetTokenValidationParameters();
             });
 
         services.AddDbContext<DatabaseContext>(options =>
@@ -67,7 +67,7 @@ public class Program
         services.AddTransient<IUserRepository, UserRepository>();
 
         services.AddTransient<IPasswordHasherService, PasswordHasherService>();
-        services.AddTransient<IJwtKeyService, JwtKeyService>();
+        services.AddTransient<ITokenService, TokenService>();
 
         services.AddTransient<IUserService, UserService>();
 

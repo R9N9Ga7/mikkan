@@ -12,6 +12,8 @@ public class MapperProfile : Profile
     {
         CreateMap<UserCreateRequest, User>();
         CreateMap<UserLoginRequest, User>();
-        CreateMap<UserLoginDto, UserLoginResponse>();
+
+        CreateMap<UserTokensDto, UserTokensResponse>();
+        CreateMap<UserTokensRequest, UserTokensDto>();
     }
 }

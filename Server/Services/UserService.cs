@@ -5,6 +5,8 @@ using Server.Interfaces.Services;
 using Server.Models.Dtos;
 using Server.Models.Entities;
 using Server.Settings;
+using System.Collections;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Server.Services;
@@ -14,12 +16,12 @@ public class UserService : IUserService
     public UserService(
         IUserRepository userRepository,
         IPasswordHasherService passwordHasherService,
-        IJwtKeyService jwtKeyService,
+        ITokenService tokenService,
         IOptions<AccountSettings> options)
     {
         _userRepository = userRepository;
         _passwordHasherService = passwordHasherService;
-        _jwtKeyService = jwtKeyService;
+        _tokenService = tokenService;
 
         _accountSettings = options.Value;
     }
@@ -49,7 +51,7 @@ public class UserService : IUserService
         return createdUser;
     }
 
-    public async Task<UserLoginDto> Login(User user)
+    public async Task<UserTokensDto> Login(User user)
     {
         var findedUser = await _userRepository.GetByUsername(user.Username);
 
@@ -69,19 +71,42 @@ public class UserService : IUserService
             new(ClaimTypes.Name, findedUser.Username),
         };
 
-        var refreshToken = _jwtKeyService.GetRefreshToken(claims);
-        var accessToken = _jwtKeyService.GetAccessToken(claims);
+        var refreshToken = _tokenService.GetRefreshToken(claims);
+        var accessToken = _tokenService.GetAccessToken(claims);
 
-        var userLoginDto = new UserLoginDto {
+        var userTokensDto = new UserTokensDto {
             AccessToken = accessToken,
             RefreshToken = refreshToken
         };
 
-        return userLoginDto;
+        return userTokensDto;
+    }
+
+    public async Task<UserTokensDto> RefreshTokens(UserTokensDto userTokensDto)
+    {
+        var tokenValidationResult = await _tokenService.ValidateToken(userTokensDto.RefreshToken);
+
+        if (!tokenValidationResult.IsValid)
+        {
+            throw new UserUnauthorizedException();
+        }
+
+        var claims = tokenValidationResult.ClaimsIdentity.Claims;
+
+        var refreshToken = _tokenService.GetRefreshToken(claims);
+        var accessToken = _tokenService.GetAccessToken(claims);
+
+        var refreshedUserTokensDto = new UserTokensDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
+
+        return refreshedUserTokensDto;
     }
 
     readonly IUserRepository _userRepository;
     readonly IPasswordHasherService _passwordHasherService;
-    readonly IJwtKeyService _jwtKeyService;
+    readonly ITokenService _tokenService;
     readonly AccountSettings _accountSettings;
 }

@@ -8,14 +8,14 @@ using System.Text;
 
 namespace Server.Services;
 
-public class JwtKeyService : IJwtKeyService
+public class TokenService : ITokenService
 {
-    public JwtKeyService(AuthSettings authSettings)
+    public TokenService(AuthSettings authSettings)
     {
         _authSettings = authSettings;
     }
 
-    public JwtKeyService(IOptions<AuthSettings> options)
+    public TokenService(IOptions<AuthSettings> options)
     {
         _authSettings = options.Value;
     }
@@ -35,21 +35,21 @@ public class JwtKeyService : IJwtKeyService
         return parameters;
     }
 
-    public string GetAccessToken(List<Claim> claims)
+    public string GetAccessToken(IEnumerable<Claim> claims)
     {
         var expiresTime = TimeSpan.FromMinutes(_authSettings.AccessTokenExpiresTimeInMinutes);
         var token = CreateToken(claims, expiresTime);
         return token;
     }
 
-    public string GetRefreshToken(List<Claim> claims)
+    public string GetRefreshToken(IEnumerable<Claim> claims)
     {
         var expiresTime = TimeSpan.FromMinutes(_authSettings.RefreshTokenExpiresTimeInMinutes);
         var token = CreateToken(claims, expiresTime);
         return token;
     }
 
-    string CreateToken(List<Claim> claims, TimeSpan expiresTime)
+    string CreateToken(IEnumerable<Claim> claims, TimeSpan expiresTime)
     {
         var signingCredentials = new SigningCredentials(
             GetSymmetricSecurityKey(),
@@ -74,6 +74,14 @@ public class JwtKeyService : IJwtKeyService
         var key = Encoding.UTF8.GetBytes(_authSettings.Key);
         var symmetricSecurityKey = new SymmetricSecurityKey(key);
         return symmetricSecurityKey;
+    }
+
+    public async Task<TokenValidationResult> ValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenValidationResult = await tokenHandler.ValidateTokenAsync(
+            token, GetTokenValidationParameters());
+        return tokenValidationResult;
     }
 
     readonly AuthSettings _authSettings;

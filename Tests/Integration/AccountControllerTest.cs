@@ -1,7 +1,5 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Server.Interfaces.Repositories;
 using Server.Interfaces.Services;
 using Server.Models.Requests;
@@ -23,7 +21,7 @@ public class AccountControllerTest : IntegrationTestBase
         : base(factory)
     {
         _userRepository = GetService<IUserRepository>();
-        _jwtKeyService = GetService<IJwtKeyService>();
+        _tokenService = GetService<ITokenService>();
     }
 
     [Fact]
@@ -150,30 +148,16 @@ public class AccountControllerTest : IntegrationTestBase
         var loginResponse = await Post($"{Url}/login", userCreateRequest);
         loginResponse.EnsureSuccessStatusCode();
 
-        var loginContent = await DeserializeResponse<UserLoginResponse>(loginResponse);
+        var loginContent = await DeserializeResponse<UserTokensResponse>(loginResponse);
         loginContent.Should().NotBeNull();
         loginContent.AccessToken.Should().NotBeEmpty();
         loginContent.RefreshToken.Should().NotBeEmpty();
 
-        var tokenHandler = new JwtSecurityTokenHandler();
+        var refreshTokenValidationResult = await _tokenService.ValidateToken(loginContent.RefreshToken);
+        refreshTokenValidationResult.IsValid.Should().BeTrue();
 
-        {
-            var claimPrincipal = tokenHandler.ValidateToken(
-                loginContent.RefreshToken,
-                _jwtKeyService.GetTokenValidationParameters(),
-                out _);
-
-            claimPrincipal.HasClaim(ClaimTypes.Name, userCreateRequest.Username).Should().BeTrue();
-        }
-
-        {
-            var claimPrincipal = tokenHandler.ValidateToken(
-                loginContent.AccessToken,
-                _jwtKeyService.GetTokenValidationParameters(),
-                out _);
-
-            claimPrincipal.HasClaim(ClaimTypes.Name, userCreateRequest.Username).Should().BeTrue();
-        }
+        var accessTokenValidationResult = await _tokenService.ValidateToken(loginContent.AccessToken);
+        accessTokenValidationResult.IsValid.Should().BeTrue();
     }
 
     [Fact]
@@ -187,8 +171,49 @@ public class AccountControllerTest : IntegrationTestBase
         loginResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
+    [Fact]
+    public async Task RefreshValidTokens()
+    {
+        var userCreateRequest = UserData.GetUserCreateRequest();
+
+        var userCreateResponse = await Post($"{Url}/create", userCreateRequest);
+        userCreateResponse.EnsureSuccessStatusCode();
+
+        var loginResponse = await Post($"{Url}/login", userCreateRequest);
+        loginResponse.EnsureSuccessStatusCode();
+
+        var loginContent = await DeserializeResponse<UserTokensResponse>(loginResponse);
+        loginContent.Should().NotBeNull();
+        loginContent.AccessToken.Should().NotBeEmpty();
+        loginContent.RefreshToken.Should().NotBeEmpty();
+
+        var refreshTokensResponse = await Post($"{Url}/refresh", loginContent);
+        refreshTokensResponse.EnsureSuccessStatusCode();
+
+        var refreshTokensContent = await DeserializeResponse<UserTokensResponse>(refreshTokensResponse);
+        refreshTokensContent.Should().NotBeNull();
+
+        var refreshTokenValidationResult = await _tokenService.ValidateToken(refreshTokensContent.RefreshToken);
+        refreshTokenValidationResult.IsValid.Should().BeTrue();
+
+        var accessTokenValidationResult = await _tokenService.ValidateToken(refreshTokensContent.AccessToken);
+        accessTokenValidationResult.IsValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task RefreshInvalidTokens()
+    {
+        var userTokensRequest = new UserTokensRequest {
+            AccessToken = "AccessToken",
+            RefreshToken = "RefreshToken"
+        };
+
+        var refreshTokensResponse = await Post($"{Url}/refresh", userTokensRequest);
+        refreshTokensResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
     const string Url = "/api/account";
 
     readonly IUserRepository _userRepository;
-    readonly IJwtKeyService _jwtKeyService;
+    readonly ITokenService _tokenService;
 }
