@@ -69,6 +69,7 @@ public class UserService : IUserService
 
         var claims = new List<Claim> {
             new(ClaimTypes.Name, findedUser.Username),
+            new(ClaimTypes.NameIdentifier, findedUser.Id.ToString()),
         };
 
         var refreshToken = _tokenService.GetRefreshToken(claims);
