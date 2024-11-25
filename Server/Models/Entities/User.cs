@@ -6,4 +6,5 @@ public class User
     public string Username { get; set; } = null!;
     public string Password { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
+    public List<Item> Items { get; set; } = new();
 }

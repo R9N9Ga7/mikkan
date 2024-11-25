@@ -5,8 +5,6 @@ using Server.Interfaces.Services;
 using Server.Models.Dtos;
 using Server.Models.Entities;
 using Server.Settings;
-using System.Collections;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Server.Services;

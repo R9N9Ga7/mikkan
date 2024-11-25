@@ -12,4 +12,5 @@ public class DatabaseContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Item> Items { get; set; } = null!;
 }

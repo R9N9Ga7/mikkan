@@ -15,5 +15,8 @@ public class MapperProfile : Profile
 
         CreateMap<UserTokensDto, UserTokensResponse>();
         CreateMap<UserTokensRequest, UserTokensDto>();
+
+        CreateMap<AddItemRequest, Item>();
+        CreateMap<Item, ItemResponse>();
     }
 }
