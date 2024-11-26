@@ -5,10 +5,8 @@ using Server.Interfaces.Services;
 using Server.Models.Requests;
 using Server.Models.Responses;
 using Server.Settings;
-using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Json;
-using System.Security.Claims;
 using Tests.Common;
 using Tests.Data;
 using Tests.Factories;
@@ -29,7 +27,7 @@ public class AccountControllerTest : IntegrationTestBase
     {
         var userCreateRequest = UserData.GetUserCreateRequest();
 
-        var response = await Post($"{Url}/create", userCreateRequest);
+        var response = await Post(UrlCreate, userCreateRequest, false);
         response.EnsureSuccessStatusCode();
 
         var isUserExists = await _userRepository.IsExists(userCreateRequest.Username);
@@ -41,7 +39,7 @@ public class AccountControllerTest : IntegrationTestBase
     {
         var userCreateRequest = UserData.GetUserCreateRequest();
 
-        var response = await Post($"{Url}/create", userCreateRequest);
+        var response = await Post(UrlCreate, userCreateRequest, false);
         response.EnsureSuccessStatusCode();
 
         var user = await _userRepository.GetByUsername(userCreateRequest.Username);
@@ -54,10 +52,10 @@ public class AccountControllerTest : IntegrationTestBase
     {
         var userCreateRequest = UserData.GetUserCreateRequest();
 
-        var firstUser = await Post($"{Url}/create", userCreateRequest);
+        var firstUser = await Post(UrlCreate, userCreateRequest, false);
         firstUser.EnsureSuccessStatusCode();
 
-        var secondUser = await Post($"{Url}/create", userCreateRequest);
+        var secondUser = await Post(UrlCreate, userCreateRequest, false);
         secondUser.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -65,7 +63,7 @@ public class AccountControllerTest : IntegrationTestBase
     [ClassData(typeof(UserDataInvalid))]
     public async Task CreatingUserWithInvalidData(UserCreateRequest userCreateRequest)
     {
-        var secondUser = await Post($"{Url}/create", userCreateRequest);
+        var secondUser = await Post(UrlCreate, userCreateRequest, false);
         secondUser.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -91,14 +89,14 @@ public class AccountControllerTest : IntegrationTestBase
         {
             var userCreateRequest = UserData.GetUserCreateRequest();
 
-            var response = await client.PostAsJsonAsync($"{Url}/create", userCreateRequest);
+            var response = await client.PostAsJsonAsync(UrlCreate, userCreateRequest);
             response.EnsureSuccessStatusCode();
         }
 
         {
             var userCreateRequest = UserData.GetUserCreateRequest();
 
-            var response = await client.PostAsJsonAsync($"{Url}/create", userCreateRequest);
+            var response = await client.PostAsJsonAsync(UrlCreate, userCreateRequest);
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
     }
@@ -125,14 +123,14 @@ public class AccountControllerTest : IntegrationTestBase
         {
             var userCreateRequest = UserData.GetUserCreateRequest();
 
-            var response = await client.PostAsJsonAsync($"{Url}/create", userCreateRequest);
+            var response = await client.PostAsJsonAsync(UrlCreate, userCreateRequest);
             response.EnsureSuccessStatusCode();
         }
 
         {
             var userCreateRequest = UserData.GetUserCreateRequest();
 
-            var response = await client.PostAsJsonAsync($"{Url}/create", userCreateRequest);
+            var response = await client.PostAsJsonAsync(UrlCreate, userCreateRequest);
             response.EnsureSuccessStatusCode();
         }
     }
@@ -142,10 +140,10 @@ public class AccountControllerTest : IntegrationTestBase
     {
         var userCreateRequest = UserData.GetUserCreateRequest();
 
-        var user = await Post($"{Url}/create", userCreateRequest);
+        var user = await Post(UrlCreate, userCreateRequest, false);
         user.EnsureSuccessStatusCode();
 
-        var loginResponse = await Post($"{Url}/login", userCreateRequest);
+        var loginResponse = await Post(UrlLogin, userCreateRequest, false);
         loginResponse.EnsureSuccessStatusCode();
 
         var loginContent = await DeserializeResponse<UserTokensResponse>(loginResponse);
@@ -167,7 +165,7 @@ public class AccountControllerTest : IntegrationTestBase
             Username = "WrongUsername",
             Password = "WrongPassword",
         };
-        var loginResponse = await Post($"{Url}/login", userCreateRequest);
+        var loginResponse = await Post(UrlLogin, userCreateRequest, false);
         loginResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
@@ -176,10 +174,10 @@ public class AccountControllerTest : IntegrationTestBase
     {
         var userCreateRequest = UserData.GetUserCreateRequest();
 
-        var userCreateResponse = await Post($"{Url}/create", userCreateRequest);
+        var userCreateResponse = await Post(UrlCreate, userCreateRequest, false);
         userCreateResponse.EnsureSuccessStatusCode();
 
-        var loginResponse = await Post($"{Url}/login", userCreateRequest);
+        var loginResponse = await Post(UrlLogin, userCreateRequest, false);
         loginResponse.EnsureSuccessStatusCode();
 
         var loginContent = await DeserializeResponse<UserTokensResponse>(loginResponse);
@@ -187,7 +185,7 @@ public class AccountControllerTest : IntegrationTestBase
         loginContent.AccessToken.Should().NotBeEmpty();
         loginContent.RefreshToken.Should().NotBeEmpty();
 
-        var refreshTokensResponse = await Post($"{Url}/refresh", loginContent);
+        var refreshTokensResponse = await Post(UrlRefresh, loginContent, false);
         refreshTokensResponse.EnsureSuccessStatusCode();
 
         var refreshTokensContent = await DeserializeResponse<UserTokensResponse>(refreshTokensResponse);
@@ -208,11 +206,14 @@ public class AccountControllerTest : IntegrationTestBase
             RefreshToken = "RefreshToken"
         };
 
-        var refreshTokensResponse = await Post($"{Url}/refresh", userTokensRequest);
+        var refreshTokensResponse = await Post(UrlRefresh, userTokensRequest, false);
         refreshTokensResponse.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
     const string Url = "/api/account";
+    const string UrlCreate = $"{Url}/create";
+    const string UrlLogin = $"{Url}/login";
+    const string UrlRefresh = $"{Url}/refresh";
 
     readonly IUserRepository _userRepository;
     readonly ITokenService _tokenService;
