@@ -65,11 +65,13 @@ public class Program
         services.AddAutoMapper(typeof(MapperProfile));
 
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IItemRepository, ItemRepository>();
 
         services.AddTransient<IPasswordHasherService, PasswordHasherService>();
         services.AddTransient<ITokenService, TokenService>();
 
         services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IItemService, ItemService>();
 
         services.Configure<AccountSettings>(builder.Configuration.GetSection("AccountSettings"));
         services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
