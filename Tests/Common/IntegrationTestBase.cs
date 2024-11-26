@@ -95,7 +95,7 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase>
         if (isAuth)
         {
             var tokens = await GetTestUserTokens();
-            client.DefaultRequestHeaders.Add("Bearer", tokens.AccessToken);
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokens.AccessToken}");
         }
         return client;
     }
