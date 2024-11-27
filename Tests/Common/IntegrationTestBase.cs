@@ -63,9 +63,11 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase>
     {
         if (_testUser == null)
         {
+            const string Password = "Test-Password";
+
             _testUser = new User {
                 Username = "Test-User",
-                Password = "Test-Password"
+                Password = Password
             };
 
             var userRepository = GetService<IUserRepository>();
@@ -73,8 +75,10 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase>
             if (!isExists)
             {
                 var userService = GetService<IUserService>();
-                var user = new User { Username = _testUser.Username, Password = _testUser.Password };
-                await userService.Create(user);
+                _testUser = await userService.Create(_testUser);
+
+                // Revert password from hash for authorization
+                _testUser.Password = Password;
             }
         }
 
