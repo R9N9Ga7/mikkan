@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.Exceptions;
+using Server.Extensions;
 using Server.Interfaces.Services;
 using Server.Models.Entities;
 using Server.Models.Requests;
+using Server.Models.Responses;
 using System.Security.Claims;
 
 namespace Server.Controllers;
@@ -28,9 +30,16 @@ public class VaultController : ControllerBase
             var item = _mapper.Map<Item>(vaultAddItemRequest);
             var userId = GetUserId();
 
-            await _itemService.Create(item, userId);
+            var createdItem = await _itemService.Create(item, userId);
+            var itemResponse = _mapper.Map<ItemResponse>(createdItem);
 
-            return Results.Created();
+            var url = Url.Action(
+                nameof(AddItem),
+                this.GetControllerName(),
+                new { id = itemResponse.Id }
+            );
+
+            return Results.Created(url, itemResponse);
         } catch (BadRequestException)
         {
             return Results.BadRequest();

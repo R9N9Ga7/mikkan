@@ -13,9 +13,9 @@ namespace Server.Controllers;
 [Route("api/[controller]")]
 public class AccountController
 {
-    public AccountController(IUserService userRepository, IMapper mapper)
+    public AccountController(IUserService userService, IMapper mapper)
     {
-        _userService = userRepository;
+        _userService = userService;
         _mapper = mapper;
     }
 

@@ -28,5 +28,12 @@ public class ItemRepository : IItemRepository
         return items;
     }
 
+    public async Task<bool> IsExists(Guid id)
+    {
+        var isExists = await _databaseContext.Items
+            .AnyAsync(i => i.Id == id);
+        return isExists;
+    }
+
     readonly DatabaseContext _databaseContext;
 }
