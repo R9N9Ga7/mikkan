@@ -72,14 +72,18 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase>
 
             var userRepository = GetService<IUserRepository>();
             var isExists = await userRepository.IsExists(_testUser.Username);
-            if (!isExists)
+            if (isExists)
+            {
+                _testUser = await userRepository.GetByUsername(_testUser.Username);
+                Assert.NotNull(_testUser);
+            } else
             {
                 var userService = GetService<IUserService>();
                 _testUser = await userService.Create(_testUser);
-
-                // Revert password from hash for authorization
-                _testUser.Password = Password;
             }
+
+            // Revert password from hash for authorization
+            _testUser.Password = Password;
         }
 
         return _testUser;
