@@ -89,12 +89,29 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase>
         return _testUser;
     }
 
-    protected async Task<UserTokensDto> GetTestUserTokens()
+    protected async Task<UserTokensDto> GetTestUserTokens(User user)
     {
         var userService = GetService<IUserService>();
-        var user = await GetTestUser();
         var tokens = await userService.Login(user);
         return tokens;
+    }
+
+    protected async Task<User> CreateRandomTestUser()
+    {
+        const string Password = "Test-Password";
+
+        var user = new User
+        {
+            Username = $"Test-Username-{Guid.NewGuid()}",
+            Password = Password,
+        };
+        var userService = GetService<IUserService>();
+
+        var createdUser = await userService.Create(user);
+        // Revert password from hash for authorization
+        createdUser.Password = Password;
+
+        return createdUser;
     }
 
     async Task<HttpClient> GetClient(bool isAuth)
@@ -102,7 +119,8 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactoryBase>
         var client = _factory.CreateClient();
         if (isAuth)
         {
-            var tokens = await GetTestUserTokens();
+            var user = await GetTestUser();
+            var tokens = await GetTestUserTokens(user);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {tokens.AccessToken}");
         }
         return client;
