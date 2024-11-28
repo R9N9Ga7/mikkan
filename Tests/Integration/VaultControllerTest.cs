@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using Server.Interfaces.Repositories;
+using Server.Interfaces.Services;
 using Server.Models.Entities;
 using Server.Models.Requests;
+using Server.Models.Responses;
 using System.Net;
 using Tests.Common;
 using Tests.Data;
@@ -15,6 +17,7 @@ public class VaultControllerTest : IntegrationTestBase
         : base(factory)
     {
         _itemRepository = GetService<IItemRepository>();
+        _itemService = GetService<IItemService>();
     }
 
     [Fact]
@@ -48,8 +51,63 @@ public class VaultControllerTest : IntegrationTestBase
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
+    [Fact]
+    public async Task GetItemByIdValidData()
+    {
+        var item = new Item {
+            Name = "Test-Name",
+            Login = "Test-Login",
+            Password = "Test-Password",
+        };
+
+        var user = await GetTestUser();
+        var createdItem = await _itemService.Create(item, user.Id);
+
+        var response = await Get($"{UrlAddItem}/{createdItem.Id}");
+        response.EnsureSuccessStatusCode();
+
+        var content = await DeserializeResponse<ItemResponse>(response);
+        content.Should().NotBeNull();
+
+        content.Name.Should().BeEquivalentTo(item.Name);
+        content.Login.Should().BeEquivalentTo(item.Login);
+        content.Password.Should().BeEquivalentTo(item.Password);
+    }
+
+    [Fact]
+    public async Task GetItemByIdWithInvalidUserId()
+    {
+        var item = new Item
+        {
+            Name = "Test-Name",
+            Login = "Test-Login",
+            Password = "Test-Password",
+        };
+
+        var user = await CreateRandomTestUser();
+        var createdItem = await _itemService.Create(item, user.Id);
+
+        var response = await Get($"{UrlAddItem}/{createdItem.Id}");
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task GetItemByIdWidthInvalidItemId()
+    {
+        var response = await Get($"{UrlAddItem}/{Guid.NewGuid()}");
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetItemByIdWithoutAuthorization()
+    {
+        var response = await Get($"{UrlAddItem}/{Guid.NewGuid()}", false);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
     const string Url = "api/vault";
     const string UrlAddItem = Url;
 
     readonly IItemRepository _itemRepository;
+    readonly IItemService _itemService;
 }
