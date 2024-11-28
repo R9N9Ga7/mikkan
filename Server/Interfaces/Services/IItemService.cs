@@ -6,4 +6,5 @@ public interface IItemService
 {
     public Task<Item> Create(Item item, Guid userId);
     public Task<IEnumerable<Item>> GetAllByUserId(Guid userId);
+    public Task<Item> GetById(Guid userId, Guid itemId);
 }

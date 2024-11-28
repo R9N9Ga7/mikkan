@@ -34,7 +34,7 @@ public class VaultController : ControllerBase
             var itemResponse = _mapper.Map<ItemResponse>(createdItem);
 
             var url = Url.Action(
-                nameof(AddItem),
+                nameof(GetById),
                 this.GetControllerName(),
                 new { id = itemResponse.Id }
             );
@@ -59,6 +59,27 @@ public class VaultController : ControllerBase
         } catch (BadRequestException)
         {
             return Results.BadRequest();
+        }
+    }
+
+    [Authorize]
+    [HttpGet("{itemId}")]
+    public async Task<IResult> GetById(Guid itemId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var item = await _itemService.GetById(userId, itemId);
+            var itemResponse = _mapper.Map<ItemResponse>(item);
+            return Results.Json(itemResponse);
+        }
+        catch (ItemNotFoundException)
+        {
+            return Results.NotFound();
+        }
+        catch (UserUnauthorizedException)
+        {
+            return Results.Unauthorized();
         }
     }
 

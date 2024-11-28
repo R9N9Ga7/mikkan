@@ -1,4 +1,5 @@
-﻿using Server.Interfaces.Repositories;
+﻿using Server.Exceptions;
+using Server.Interfaces.Repositories;
 using Server.Interfaces.Services;
 using Server.Models.Entities;
 
@@ -25,6 +26,20 @@ public class ItemService : IItemService
     {
         var items = await _itemRepository.GetAllByUserId(userId);
         return items;
+    }
+
+    public async Task<Item> GetById(Guid userId, Guid itemId)
+    {
+        var item = await _itemRepository.GetById(itemId);
+        if (item == null)
+        {
+            throw new ItemNotFoundException();
+        }
+        if (item.UserId != userId)
+        {
+            throw new UserUnauthorizedException();
+        }
+        return item;
     }
 
     readonly IItemRepository _itemRepository;
