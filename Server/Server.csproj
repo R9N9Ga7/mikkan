@@ -9,11 +9,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
+    <WarningLevel>8</WarningLevel>
+    <NoWarn>1701;1702;IDE0008;IDE0160;IDE0040</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <WarningLevel>7</WarningLevel>
+    <WarningLevel>8</WarningLevel>
+    <NoWarn>1701;1702;IDE0008;IDE0160;IDE0040</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
