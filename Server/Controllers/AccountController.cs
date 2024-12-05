@@ -11,14 +11,8 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController
+public class AccountController(IUserService userService, IMapper mapper)
 {
-    public AccountController(IUserService userService, IMapper mapper)
-    {
-        _userService = userService;
-        _mapper = mapper;
-    }
-
     [HttpPost("create")]
     public async Task<IResult> Create(UserCreateRequest userCreateRequest)
     {
@@ -75,6 +69,6 @@ public class AccountController
         }
     }
 
-    readonly IUserService _userService;
-    readonly IMapper _mapper;
+    readonly IUserService _userService = userService;
+    readonly IMapper _mapper = mapper;
 }

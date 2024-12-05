@@ -5,13 +5,8 @@ using Server.Models.Entities;
 
 namespace Server.Repositories;
 
-public class UserRepository : IUserRepository
+public class UserRepository(DatabaseContext databaseContext) : IUserRepository
 {
-    public UserRepository(DatabaseContext databaseContext)
-    {
-        _databaseContext = databaseContext;
-    }
-
     public async Task<User> Create(User user)
     {
         await _databaseContext.Users.AddAsync(user);
@@ -22,24 +17,20 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByUsername(string username)
     {
-        var user = await _databaseContext.Users
+        return await _databaseContext.Users
             .FirstOrDefaultAsync(u => u.Username == username);
-
-        return user;
     }
 
     public async Task<bool> IsExists(string username)
     {
-        var isExists = await _databaseContext.Users
+        return await _databaseContext.Users
             .AnyAsync(u => u.Username == username);
-        return isExists;
     }
 
     public async Task<int> Count()
     {
-        var count = await _databaseContext.Users.CountAsync();
-        return count;
+        return await _databaseContext.Users.CountAsync();
     }
 
-    readonly DatabaseContext _databaseContext;
+    readonly DatabaseContext _databaseContext = databaseContext;
 }

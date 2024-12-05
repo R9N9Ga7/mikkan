@@ -22,7 +22,7 @@ public class TokenService : ITokenService
 
     public TokenValidationParameters GetTokenValidationParameters()
     {
-        var parameters = new TokenValidationParameters
+        return new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidIssuer = _authSettings.Issuer,
@@ -32,21 +32,18 @@ public class TokenService : ITokenService
             IssuerSigningKey = GetSymmetricSecurityKey(),
             ValidateIssuerSigningKey = true,
         };
-        return parameters;
     }
 
     public string GetAccessToken(IEnumerable<Claim> claims)
     {
         var expiresTime = TimeSpan.FromMinutes(_authSettings.AccessTokenExpiresTimeInMinutes);
-        var token = CreateToken(claims, expiresTime);
-        return token;
+        return CreateToken(claims, expiresTime);
     }
 
     public string GetRefreshToken(IEnumerable<Claim> claims)
     {
         var expiresTime = TimeSpan.FromMinutes(_authSettings.RefreshTokenExpiresTimeInMinutes);
-        var token = CreateToken(claims, expiresTime);
-        return token;
+        return CreateToken(claims, expiresTime);
     }
 
     string CreateToken(IEnumerable<Claim> claims, TimeSpan expiresTime)
@@ -65,23 +62,21 @@ public class TokenService : ITokenService
         );
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var token = tokenHandler.WriteToken(securityToken);
-        return token;
+        return tokenHandler.WriteToken(securityToken);
     }
 
     SymmetricSecurityKey GetSymmetricSecurityKey()
     {
         var key = Encoding.UTF8.GetBytes(_authSettings.Key);
-        var symmetricSecurityKey = new SymmetricSecurityKey(key);
-        return symmetricSecurityKey;
+        return new SymmetricSecurityKey(key);
     }
 
     public async Task<TokenValidationResult> ValidateToken(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var tokenValidationResult = await tokenHandler.ValidateTokenAsync(
-            token, GetTokenValidationParameters());
-        return tokenValidationResult;
+        return await tokenHandler.ValidateTokenAsync(
+            token, GetTokenValidationParameters()
+        );
     }
 
     readonly AuthSettings _authSettings;

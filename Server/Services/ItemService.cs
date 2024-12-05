@@ -25,16 +25,9 @@ public class ItemService(IItemRepository itemRepository) : IItemService
 
     public async Task<Item> GetById(Guid userId, Guid itemId)
     {
-        var item = await _itemRepository.GetById(itemId);
-        if (item == null)
-        {
-            throw new ItemNotFoundException();
-        }
-        if (item.UserId != userId)
-        {
-            throw new UserUnauthorizedException();
-        }
-        return item;
+        var item = await _itemRepository.GetById(itemId) ?? throw new ItemNotFoundException();
+        return item.UserId == userId
+            ? item : throw new UserUnauthorizedException();
     }
 
     public async Task RemoveById(Guid userId, Guid itemId)

@@ -5,13 +5,8 @@ using Server.Models.Entities;
 
 namespace Server.Repositories;
 
-public class ItemRepository : IItemRepository
+public class ItemRepository(DatabaseContext databaseContext) : IItemRepository
 {
-    public ItemRepository(DatabaseContext databaseContext)
-    {
-        _databaseContext = databaseContext;
-    }
-
     public async Task<Item> Create(Item item)
     {
         await _databaseContext.Items.AddAsync(item);
@@ -21,25 +16,21 @@ public class ItemRepository : IItemRepository
 
     public async Task<IEnumerable<Item>> GetAllByUserId(Guid userId)
     {
-        var items = await _databaseContext.Items
+        return await _databaseContext.Items
             .Where(i => i.UserId == userId)
             .ToListAsync();
-
-        return items;
     }
 
     public async Task<bool> IsExists(Guid id)
     {
-        var isExists = await _databaseContext.Items
+        return await _databaseContext.Items
             .AnyAsync(i => i.Id == id);
-        return isExists;
     }
 
     public async Task<Item?> GetById(Guid id)
     {
-        var item = await _databaseContext.Items
+        return await _databaseContext.Items
             .FirstOrDefaultAsync(i => i.Id == id);
-        return item;
     }
 
     public async Task Remove(Item item)
@@ -48,5 +39,5 @@ public class ItemRepository : IItemRepository
         await _databaseContext.SaveChangesAsync();
     }
 
-    readonly DatabaseContext _databaseContext;
+    readonly DatabaseContext _databaseContext = databaseContext;
 }

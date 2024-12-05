@@ -104,8 +104,7 @@ public class VaultController(IItemService itemService, IMapper mapper) : Control
         var nameIdentifierClaim = User?.FindFirst(ClaimTypes.NameIdentifier)
             ?? throw new BadRequestException();
 
-        var userId = new Guid(nameIdentifierClaim.Value);
-        return userId;
+        return new Guid(nameIdentifierClaim.Value); ;
     }
 
     readonly IItemService _itemService = itemService;

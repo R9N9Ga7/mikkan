@@ -9,21 +9,13 @@ using System.Security.Claims;
 
 namespace Server.Services;
 
-public class UserService : IUserService
-{
-    public UserService(
+public class UserService(
         IUserRepository userRepository,
         IPasswordHasherService passwordHasherService,
         ITokenService tokenService,
-        IOptions<AccountSettings> options)
-    {
-        _userRepository = userRepository;
-        _passwordHasherService = passwordHasherService;
-        _tokenService = tokenService;
-
-        _accountSettings = options.Value;
-    }
-
+        IOptions<AccountSettings> options
+) : IUserService
+{
     public async Task<User> Create(User user)
     {
         var userRegistrationsLimit = _accountSettings.UserRegistrationsLimit;
@@ -51,21 +43,17 @@ public class UserService : IUserService
 
     public async Task<UserTokensDto> Login(User user)
     {
-        var findedUser = await _userRepository.GetByUsername(user.Username);
-
-        if (findedUser == null)
-        {
-            throw new UserNotFoundException();
-        }
+        var findedUser = await _userRepository.GetByUsername(user.Username)
+            ?? throw new UserNotFoundException();
 
         var isValidPassword = _passwordHasherService.VerifyPassword(findedUser.Password, user.Password);
-
         if (!isValidPassword)
         {
             throw new UserInvalidPasswordException();
         }
 
-        var claims = new List<Claim> {
+        var claims = new List<Claim>
+        {
             new(ClaimTypes.Name, findedUser.Username),
             new(ClaimTypes.NameIdentifier, findedUser.Id.ToString()),
         };
@@ -73,7 +61,8 @@ public class UserService : IUserService
         var refreshToken = _tokenService.GetRefreshToken(claims);
         var accessToken = _tokenService.GetAccessToken(claims);
 
-        var userTokensDto = new UserTokensDto {
+        var userTokensDto = new UserTokensDto
+        {
             AccessToken = accessToken,
             RefreshToken = refreshToken
         };
@@ -104,8 +93,8 @@ public class UserService : IUserService
         return refreshedUserTokensDto;
     }
 
-    readonly IUserRepository _userRepository;
-    readonly IPasswordHasherService _passwordHasherService;
-    readonly ITokenService _tokenService;
-    readonly AccountSettings _accountSettings;
+    readonly IUserRepository _userRepository = userRepository;
+    readonly IPasswordHasherService _passwordHasherService = passwordHasherService;
+    readonly ITokenService _tokenService = tokenService;
+    readonly AccountSettings _accountSettings = options.Value;
 }

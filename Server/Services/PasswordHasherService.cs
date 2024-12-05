@@ -5,13 +5,8 @@ using System.Security.Cryptography;
 
 namespace Server.Services;
 
-public class PasswordHasherService : IPasswordHasherService
+public class PasswordHasherService(IOptions<AccountSettings> options) : IPasswordHasherService
 {
-    public PasswordHasherService(IOptions<AccountSettings> options)
-    {
-        _accountSettings = options.Value;
-    }
-
     public string HashPassword(string password)
     {
         var salt = GenerateSalt();
@@ -36,9 +31,7 @@ public class PasswordHasherService : IPasswordHasherService
         var key = Convert.FromBase64String(parts[1]);
 
         var keyToCheck = GenerateKey(password, salt);
-        var isEqual = keyToCheck.SequenceEqual(key);
-
-        return isEqual;
+        return keyToCheck.SequenceEqual(key);
     }
 
     byte[] GenerateSalt()
@@ -55,11 +48,10 @@ public class PasswordHasherService : IPasswordHasherService
     {
         using var alg = new Rfc2898DeriveBytes(
             password, salt, _accountSettings.Iterations, HashAlgorithmName.SHA256);
-        var key = alg.GetBytes(_accountSettings.KeySize);
-        return key;
+        return alg.GetBytes(_accountSettings.KeySize);
     }
 
     const char SplitSeparator = ':';
 
-    readonly AccountSettings _accountSettings;
+    readonly AccountSettings _accountSettings = options.Value;
 }

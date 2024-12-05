@@ -7,7 +7,6 @@ public static class ControllerBaseExtensions
     public static string GetControllerName(this ControllerBase controllerBase)
     {
         var type = controllerBase.GetType();
-        var name = type.Name.Replace("Controller", string.Empty);
-        return name;
+        return type.Name.Replace("Controller", string.Empty);
     }
 }
