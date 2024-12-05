@@ -1,4 +1,5 @@
 ﻿using Server.Models.Requests;
+using Server.Models.Entities;
 using System.Collections;
 
 namespace Tests.Data;
@@ -8,6 +9,16 @@ public class ItemData
     public static AddItemRequest CreateAddItemRequest()
     {
         return new AddItemRequest
+        {
+            Login = $"Login-{Guid.NewGuid()}",
+            Password = $"Password-{Guid.NewGuid()}",
+            Name = $"Name-{Guid.NewGuid()}",
+        };
+    }
+
+    public static Item CreateItem()
+    {
+        return new Item
         {
             Login = $"Login-{Guid.NewGuid()}",
             Password = $"Password-{Guid.NewGuid()}",

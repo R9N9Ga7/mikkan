@@ -105,8 +105,50 @@ public class VaultControllerTest : IntegrationTestBase
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
+    [Fact]
+    public async Task RemoveItemByIdValidItemId()
+    {
+        var item = ItemData.CreateItem();
+        var user = await GetTestUser();
+
+        await _itemService.Create(item, user.Id);
+
+        var response = await Delete($"{UrlRemoveItem}/{item.Id}");
+        response.EnsureSuccessStatusCode();
+
+        var findedItem = await _itemRepository.GetById(item.Id);
+        findedItem.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task RemoveItemByIdInvalidId()
+    {
+        var response = await Delete($"{UrlRemoveItem}/{Guid.NewGuid()}");
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task RemoveItemByIdInvalidUserId()
+    {
+        var item = ItemData.CreateItem();
+        var user = await CreateRandomTestUser();
+
+        await _itemService.Create(item, user.Id);
+
+        var response = await Delete($"{UrlRemoveItem}/{item.Id}");
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task RemoveItemByIdWithoutAuthorization()
+    {
+        var response = await Get($"{UrlRemoveItem}/{Guid.NewGuid()}", false);
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
     const string Url = "api/vault";
     const string UrlAddItem = Url;
+    const string UrlRemoveItem = Url;
 
     readonly IItemRepository _itemRepository;
     readonly IItemService _itemService;
