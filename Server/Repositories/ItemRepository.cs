@@ -42,5 +42,11 @@ public class ItemRepository : IItemRepository
         return item;
     }
 
+    public async Task Remove(Item item)
+    {
+        _databaseContext.Items.Remove(item);
+        await _databaseContext.SaveChangesAsync();
+    }
+
     readonly DatabaseContext _databaseContext;
 }

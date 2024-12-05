@@ -8,4 +8,5 @@ public interface IItemRepository
     public Task<IEnumerable<Item>> GetAllByUserId(Guid userId);
     public Task<bool> IsExists(Guid id);
     public Task<Item?> GetById(Guid id);
+    public Task Remove(Item item);
 }

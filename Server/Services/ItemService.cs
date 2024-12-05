@@ -5,13 +5,8 @@ using Server.Models.Entities;
 
 namespace Server.Services;
 
-public class ItemService : IItemService
+public class ItemService(IItemRepository itemRepository) : IItemService
 {
-    public ItemService(IItemRepository itemRepository)
-    {
-        _itemRepository = itemRepository;
-    }
-
     public async Task<Item> Create(Item item, Guid userId)
     {
         item.UserId = userId;
@@ -42,5 +37,11 @@ public class ItemService : IItemService
         return item;
     }
 
-    readonly IItemRepository _itemRepository;
+    public async Task RemoveById(Guid userId, Guid itemId)
+    {
+        var item = await GetById(userId, itemId);
+        await _itemRepository.Remove(item);
+    }
+
+    readonly IItemRepository _itemRepository = itemRepository;
 }

@@ -13,14 +13,8 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class VaultController : ControllerBase
+public class VaultController(IItemService itemService, IMapper mapper) : ControllerBase
 {
-    public VaultController(IItemService itemService, IMapper mapper)
-    {
-        _itemService = itemService;
-        _mapper = mapper;
-    }
-
     [HttpPost]
     [Authorize]
     public async Task<IResult> AddItem(AddItemRequest vaultAddItemRequest)
@@ -34,13 +28,14 @@ public class VaultController : ControllerBase
             var itemResponse = _mapper.Map<ItemResponse>(createdItem);
 
             var url = Url.Action(
-                nameof(GetById),
+                nameof(GetItemById),
                 this.GetControllerName(),
                 new { id = itemResponse.Id }
             );
 
             return Results.Created(url, itemResponse);
-        } catch (BadRequestException)
+        }
+        catch (BadRequestException)
         {
             return Results.BadRequest();
         }
@@ -56,7 +51,8 @@ public class VaultController : ControllerBase
             var items = await _itemService.GetAllByUserId(userId);
             var itemsResponse = _mapper.Map<List<Item>>(items);
             return Results.Json(itemsResponse);
-        } catch (BadRequestException)
+        }
+        catch (BadRequestException)
         {
             return Results.BadRequest();
         }
@@ -64,7 +60,7 @@ public class VaultController : ControllerBase
 
     [Authorize]
     [HttpGet("{itemId}")]
-    public async Task<IResult> GetById(Guid itemId)
+    public async Task<IResult> GetItemById(Guid itemId)
     {
         try
         {
@@ -83,18 +79,35 @@ public class VaultController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpDelete("{itemId}")]
+    public async Task<IResult> RemoveItemById(Guid itemId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            await _itemService.RemoveById(userId, itemId);
+            return Results.Ok();
+        }
+        catch (ItemNotFoundException)
+        {
+            return Results.NotFound();
+        }
+        catch (UserUnauthorizedException)
+        {
+            return Results.Unauthorized();
+        }
+    }
+
     Guid GetUserId()
     {
-        var nameIdentifierClaim = User?.FindFirst(ClaimTypes.NameIdentifier);
-        if (nameIdentifierClaim == null)
-        {
-            throw new BadRequestException();
-        }
+        var nameIdentifierClaim = User?.FindFirst(ClaimTypes.NameIdentifier)
+            ?? throw new BadRequestException();
 
         var userId = new Guid(nameIdentifierClaim.Value);
         return userId;
     }
 
-    readonly IItemService _itemService;
-    readonly IMapper _mapper;
+    readonly IItemService _itemService = itemService;
+    readonly IMapper _mapper = mapper;
 }
