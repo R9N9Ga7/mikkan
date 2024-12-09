@@ -23,9 +23,10 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
-      'semi': [2, 'always'],
-      'quotes': [2, 'single', { 'avoidEscape': true }],
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single', { 'avoidEscape': true }],
       'comma-dangle': ['error', 'always-multiline'],
+      'indent': ['error', 2],
     },
   },
 );
