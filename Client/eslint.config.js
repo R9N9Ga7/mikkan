@@ -27,6 +27,7 @@ export default tseslint.config(
       'quotes': ['error', 'single', { 'avoidEscape': true }],
       'comma-dangle': ['error', 'always-multiline'],
       'indent': ['error', 2],
+      'jsx-quotes': ['error', 'prefer-double'],
     },
   },
 );
