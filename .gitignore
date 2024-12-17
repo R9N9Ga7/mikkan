@@ -401,3 +401,5 @@ FodyWeavers.xsd
 
 # Test database file
 test.db*
+
+*.env
