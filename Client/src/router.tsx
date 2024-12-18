@@ -4,9 +4,10 @@ import App from './app/App';
 
 import MainLayout from './layouts/MainLayout';
 import AuthLayout from './layouts/AuthLayout';
-import Registration from './pages/account/create';
+import CreateAccount from './pages/account/create';
 
-import { AUTH_URL, REGISTRATION_URL } from './consts/pagesUrls';
+import { AUTH_URL, LOGIN_URL, CREATE_ACCOUNT_URL } from './consts/pagesUrls';
+import AccountLogin from './pages/account/login';
 
 const router = createBrowserRouter([
   {
@@ -23,8 +24,12 @@ const router = createBrowserRouter([
         element: <AuthLayout />,
         children: [
           {
-            path: REGISTRATION_URL,
-            element: <Registration />,
+            path: CREATE_ACCOUNT_URL,
+            element: <CreateAccount />,
+          },
+          {
+            path: LOGIN_URL,
+            element: <AccountLogin />,
           },
         ],
       },
