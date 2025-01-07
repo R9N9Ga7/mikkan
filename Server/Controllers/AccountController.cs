@@ -60,7 +60,7 @@ public class AccountController(IUserService userService, IMapper mapper)
         {
             var userTokensDto = _mapper.Map<UserTokensDto>(userTokensRequest);
             var refreshedTokensDto = await _userService.RefreshTokens(userTokensDto);
-            var userTokensResponse = _mapper.Map<UserTokensResponse>(userTokensDto);
+            var userTokensResponse = _mapper.Map<UserTokensResponse>(refreshedTokensDto);
             return Results.Json(userTokensResponse);
         }
         catch (UserUnauthorizedException)

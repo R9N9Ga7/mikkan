@@ -196,6 +196,9 @@ public class AccountControllerTest : IntegrationTestBase
 
         var accessTokenValidationResult = await _tokenService.ValidateToken(refreshTokensContent.AccessToken);
         accessTokenValidationResult.IsValid.Should().BeTrue();
+
+        loginContent.AccessToken.Should().NotBe(refreshTokensContent.AccessToken);
+        loginContent.RefreshToken.Should().NotBe(refreshTokensContent.RefreshToken);
     }
 
     [Fact]
