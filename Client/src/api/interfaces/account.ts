@@ -3,7 +3,14 @@ export interface AuthAccountRequest {
   password: string;
 };
 
-export interface AccountLoginResponse {
+export type Account = {
   accessToken: string;
   refreshToken: string;
-}
+};
+
+export interface AccountLoginResponse extends Account {}
+
+export interface AccountRefreshTokensRequest extends Account {}
+
+export interface AccountRefreshTokensResponse extends Account {}
+

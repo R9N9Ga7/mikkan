@@ -1,9 +1,10 @@
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LOGIN_FULL_URL } from '../../../consts/pagesUrls';
+import { LOGIN_FULL_URL } from '../../../consts/pages_urls';
 import useFetchCreateAccount from '../../../hooks/api/useFetchCreateAccount';
 import AccountForm from '../common/AccountForm';
 
-function CreateAccount() {
+const CreateAccount: FC = () => {
   const navigate = useNavigate();
 
   const { fetchData, isLoading, error } = useFetchCreateAccount({
@@ -12,7 +13,7 @@ function CreateAccount() {
     },
   });
 
-  const handleOnSubmit = async (username: string, password: string) => {
+  const handleOnSubmit = async (username: string, password: string): Promise<void> => {
     await fetchData({
       username,
       password,
@@ -30,6 +31,6 @@ function CreateAccount() {
       title="Create Account"
     />
   );
-}
+};
 
 export default CreateAccount;

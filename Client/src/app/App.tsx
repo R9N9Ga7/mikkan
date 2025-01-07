@@ -1,12 +1,10 @@
+import { FC } from 'react';
 import { Outlet } from 'react-router-dom';
-import AccountProvider from '../providers/AccountProvider';
 
-function App() {
+const App: FC = () => {
   return (
-    <AccountProvider>
-      <Outlet />
-    </AccountProvider>
+    <Outlet />
   );
-}
+};
 
 export default App;

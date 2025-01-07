@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import { Alert, Button, Form, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
@@ -18,7 +19,7 @@ interface AccountFormProps {
   onSubmit: (username: string, password: string) => void;
 }
 
-function AccountForm({
+const AccountForm: FC<AccountFormProps> = ({
   onSubmit,
   title,
   actionTitle,
@@ -26,8 +27,8 @@ function AccountForm({
   linkTo,
   error,
   isLoading,
-}: AccountFormProps) {
-  const handleOnSubmit = (event: React.SyntheticEvent<AccountFormElement>) => {
+}) => {
+  const handleOnSubmit = (event: React.SyntheticEvent<AccountFormElement>): void => {
     event.preventDefault();
 
     const { username, password } = event.currentTarget;
@@ -83,6 +84,6 @@ function AccountForm({
       </Form.Group>
     </Form>
   );
-}
+};
 
 export default AccountForm;

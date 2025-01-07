@@ -1,23 +1,22 @@
+import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useFetchAccountLogin from '../../../hooks/api/useFetchAccountLogin';
-import { MAIN_PAGE_URL, REGISTRATION_FULL_URL } from '../../../consts/pagesUrls';
+import { MAIN_PAGE_URL, REGISTRATION_FULL_URL } from '../../../consts/pages_urls';
 import AccountForm from '../common/AccountForm';
-import { AccountLoginResponse } from '../../../api/interfaces/account';
-import { useContext } from 'react';
-import AccountContext, { AccountContextProps } from '../../../contexts/AccountContext';
+import { AccountLoginResponse, Account } from '../../../api/interfaces/account';
+import AccountStorage from '../../../utils/account_storage';
 
-function AccountLogin() {
+const AccountLogin: FC = () => {
   const navigate = useNavigate();
-  const { setAccount } = useContext(AccountContext) as AccountContextProps;
 
   const { fetchData, isLoading, error } = useFetchAccountLogin({
     onSuccess: (data: AccountLoginResponse | null) => {
-      setAccount(data);
+      AccountStorage.set(data as Account);
       navigate(MAIN_PAGE_URL);
     },
   });
 
-  const handleOnSubmit = async (username: string, password: string) => {
+  const handleOnSubmit = async (username: string, password: string): Promise<void> => {
     await fetchData({
       username: username,
       password: password,
@@ -35,6 +34,6 @@ function AccountLogin() {
       title="Login"
     />
   );
-}
+};
 
 export default AccountLogin;

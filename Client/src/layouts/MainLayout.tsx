@@ -1,11 +1,15 @@
+import { FC } from 'react';
 import { Outlet } from 'react-router-dom';
+import AccountMiddleware from '../middlewares/AccountMiddleware';
 
-function MainLayout() {
+const MainLayout: FC = () => {
   return (
     <div>
-      <Outlet />
+      <AccountMiddleware>
+        <Outlet />
+      </AccountMiddleware>
     </div>
   );
-}
+};
 
 export default MainLayout;
