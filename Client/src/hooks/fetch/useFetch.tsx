@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { FetchRequestConfig } from './common/fetch_request_config';
+import { FetchRequestConfig, FetchApi } from '../../common/fetch_api';
 import { AccountValidator } from '../../utils/account_validator';
-import { AccountRefreshTokensRequest, AccountRefreshTokensResponse, Account } from '../../api/interfaces/account';
+import { AccountRefreshTokensRequest, AccountRefreshTokensResponse } from '../../api/interfaces/account';
+import { Account } from '../../common/interfaces/account';
 import { useNavigate } from 'react-router-dom';
-import { LOGIN_FULL_URL } from '../../consts/pages_urls';
-import { FetchApi } from './common/fetch_api';
+import { LOGIN_FULL_URL } from '../../common/consts/pages_urls';
 import AccountRequestConfigFactory from '../../api/request_config_factories/account_request_config_factory';
 import AccountStorage from '../../utils/account_storage';
 

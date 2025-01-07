@@ -1,4 +1,4 @@
-import { Account } from '../../../api/interfaces/account';
+import { Account } from '../interfaces/account';
 import { FetchRequestConfig } from './fetch_request_config';
 
 type FetchApiSuccessEventCb<TResponse> = (data: TResponse) => void;

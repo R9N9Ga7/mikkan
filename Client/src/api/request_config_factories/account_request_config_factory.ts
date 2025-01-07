@@ -1,32 +1,30 @@
-import { CREATE_ACCOUNT_URL } from '../../consts/pages_urls';
-import { ACCOUNT_LOGIN_URL, ACCOUNT_REFRESH_TOKENS_URL } from '../../consts/server_urls';
-import { FetchRequestConfig } from '../../hooks/fetch/common/fetch_request_config';
-import { FetchRequestConfigBuilder } from '../../hooks/fetch/common/fetch_request_config_builder';
-import { FetchMethod } from '../../hooks/fetch/common/fetch_method';
+import { CREATE_ACCOUNT_URL } from '../../common/consts/pages_urls';
+import { ACCOUNT_LOGIN_URL, ACCOUNT_REFRESH_TOKENS_URL } from '../../common/consts/server_urls';
+import { FetchRequestConfig, FetchRequestConfigBuilder, FetchMethod } from '../../common/fetch_api';
 
 class AccountRequestConfigFactory {
   public static createRefreshTokensConfig(): FetchRequestConfig {
     return new FetchRequestConfigBuilder()
-      .SetMethod(FetchMethod.POST)
-      .SetUrl(ACCOUNT_REFRESH_TOKENS_URL)
-      .SetIsAuthRequired(false)
-      .Build();
+      .setMethod(FetchMethod.POST)
+      .setUrl(ACCOUNT_REFRESH_TOKENS_URL)
+      .setIsAuthRequired(false)
+      .build();
   }
 
   public static createLoginConfig(): FetchRequestConfig {
     return new FetchRequestConfigBuilder()
-      .SetMethod(FetchMethod.POST)
-      .SetUrl(ACCOUNT_LOGIN_URL)
-      .SetIsAuthRequired(false)
-      .Build();
+      .setMethod(FetchMethod.POST)
+      .setUrl(ACCOUNT_LOGIN_URL)
+      .setIsAuthRequired(false)
+      .build();
   }
 
   public static createCreateAccountConfig(): FetchRequestConfig {
     return new FetchRequestConfigBuilder()
-      .SetMethod(FetchMethod.POST)
-      .SetUrl(CREATE_ACCOUNT_URL)
-      .SetIsAuthRequired(false)
-      .Build();
+      .setMethod(FetchMethod.POST)
+      .setUrl(CREATE_ACCOUNT_URL)
+      .setIsAuthRequired(false)
+      .build();
   }
 }
 

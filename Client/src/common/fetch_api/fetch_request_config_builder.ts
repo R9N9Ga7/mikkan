@@ -2,22 +2,22 @@ import { FetchRequestConfig } from './fetch_request_config';
 import { FetchMethod } from './fetch_method';
 
 export class FetchRequestConfigBuilder {
-  public SetUrl(url : string): FetchRequestConfigBuilder {
+  public setUrl(url : string): FetchRequestConfigBuilder {
     this.requestConfig.url = url;
     return this;
   }
 
-  public SetMethod(method: FetchMethod): FetchRequestConfigBuilder {
+  public setMethod(method: FetchMethod): FetchRequestConfigBuilder {
     this.requestConfig.method = method;
     return this;
   }
 
-  public SetIsAuthRequired(isAuthRequired: boolean): FetchRequestConfigBuilder {
+  public setIsAuthRequired(isAuthRequired: boolean): FetchRequestConfigBuilder {
     this.requestConfig.isAuthRequired = isAuthRequired;
     return this;
   }
 
-  public Build(): FetchRequestConfig {
+  public build(): FetchRequestConfig {
     return this.requestConfig;
   }
 

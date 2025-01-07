@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LOGIN_FULL_URL } from '../../../consts/pages_urls';
+import { LOGIN_FULL_URL } from '../../../common/consts/pages_urls';
 import useFetchCreateAccount from '../../../hooks/api/useFetchCreateAccount';
 import AccountForm from '../common/AccountForm';
 

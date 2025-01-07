@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useFetchAccountLogin from '../../../hooks/api/useFetchAccountLogin';
-import { MAIN_PAGE_URL, REGISTRATION_FULL_URL } from '../../../consts/pages_urls';
+import { MAIN_PAGE_URL, REGISTRATION_FULL_URL } from '../../../common/consts/pages_urls';
 import AccountForm from '../common/AccountForm';
-import { AccountLoginResponse, Account } from '../../../api/interfaces/account';
+import { AccountLoginResponse } from '../../../api/interfaces/account';
+import { Account } from '../../../common/interfaces/account';
 import AccountStorage from '../../../utils/account_storage';
 
 const AccountLogin: FC = () => {

@@ -6,7 +6,7 @@ import MainLayout from './layouts/MainLayout';
 import AuthLayout from './layouts/AuthLayout';
 import CreateAccount from './pages/account/create';
 
-import { AUTH_URL, LOGIN_URL, CREATE_ACCOUNT_URL } from './consts/pages_urls';
+import { AUTH_URL, LOGIN_URL, CREATE_ACCOUNT_URL } from './common/consts/pages_urls';
 import AccountLogin from './pages/account/login';
 
 const router = createBrowserRouter([

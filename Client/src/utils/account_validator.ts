@@ -1,4 +1,4 @@
-import { Account } from '../api/interfaces/account';
+import { Account } from '../common/interfaces/account';
 import { Token } from './token';
 
 export class AccountValidator {

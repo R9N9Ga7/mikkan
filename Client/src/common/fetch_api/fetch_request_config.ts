@@ -1,4 +1,4 @@
-import { BASE_URL } from '../../../consts/server_urls';
+import { BASE_URL } from '../consts/server_urls';
 import { FetchMethod } from './fetch_method';
 
 export class FetchRequestConfig {

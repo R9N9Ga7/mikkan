@@ -1,8 +1,9 @@
 import { FC, PropsWithChildren, useEffect } from 'react';
-import { Account, AccountRefreshTokensResponse } from '../api/interfaces/account';
+import { AccountRefreshTokensResponse } from '../api/interfaces/account';
+import { Account } from '../common/interfaces/account';
 import { useNavigate } from 'react-router-dom';
 import { AccountValidator } from '../utils/account_validator';
-import { LOGIN_FULL_URL } from '../consts/pages_urls';
+import { LOGIN_FULL_URL } from '../common/consts/pages_urls';
 import useFetchAccountRefreshTokens from '../hooks/api/useFetchAccountRefreshTokens';
 import AccountStorage from '../utils/account_storage';
 
@@ -25,20 +26,22 @@ const AccountMiddleware: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   const validateAccount = async (acc: Account | null): Promise<void> => {
-    if (acc === null) {
+    if (!acc) {
       goToLoginPage();
       return;
     }
 
     const accountValidator = new AccountValidator(acc);
+    if (accountValidator.isValid()) {
+      return;
+    }
 
-    if (!accountValidator.isValid()) {
-      if (!accountValidator.isValidRefreshToken()) {
-        goToLoginPage();
-      }
-      if (!accountValidator.isValidAccessToken()) {
-        await fetchData(acc);
-      }
+    if (!accountValidator.isValidRefreshToken()) {
+      goToLoginPage();
+    }
+
+    if (!accountValidator.isValidAccessToken()) {
+      await fetchData(acc);
     }
   };
 

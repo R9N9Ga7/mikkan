@@ -1,4 +1,4 @@
-import { Account } from '../api/interfaces/account';
+import { Account } from '../common/interfaces/account';
 
 class AccountStorage {
   public static set(account: Account): void {

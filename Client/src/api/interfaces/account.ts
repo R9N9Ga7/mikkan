@@ -1,16 +1,12 @@
-export interface AuthAccountRequest {
+import { Account } from '../../common/interfaces/account';
+
+export type AuthAccountRequest = {
   username: string;
   password: string;
 };
 
-export type Account = {
-  accessToken: string;
-  refreshToken: string;
-};
+export type AccountLoginResponse = Account;
 
-export interface AccountLoginResponse extends Account {}
+export type AccountRefreshTokensRequest = Account;
 
-export interface AccountRefreshTokensRequest extends Account {}
-
-export interface AccountRefreshTokensResponse extends Account {}
-
+export type AccountRefreshTokensResponse = Account;
