@@ -1,6 +1,8 @@
 export const AUTH_URL = 'auth';
 export const MAIN_PAGE_URL = '/';
 
+export const ADD_ITEM_PARAM_FULL_URL = `${MAIN_PAGE_URL}?add-item=true`;
+
 export const CREATE_ACCOUNT_URL = 'create';
 export const LOGIN_URL = 'login';
 

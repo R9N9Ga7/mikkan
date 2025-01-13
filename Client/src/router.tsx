@@ -2,12 +2,13 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import App from './app/App';
 
-import MainLayout from './layouts/MainLayout';
-import AuthLayout from './layouts/AuthLayout';
+import MainLayout from './layouts/main/MainLayout';
+import AuthLayout from './layouts/auth/AuthLayout';
 import CreateAccount from './pages/account/create';
 
 import { AUTH_URL, LOGIN_URL, CREATE_ACCOUNT_URL } from './common/consts/pages_urls';
 import AccountLogin from './pages/account/login';
+import Main from './pages/main';
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,12 @@ const router = createBrowserRouter([
       {
         path: '/',
         element: <MainLayout />,
-        children: [],
+        children: [
+          {
+            path: '',
+            element: <Main />,
+          },
+        ],
       },
       {
         path: AUTH_URL,
