@@ -11,6 +11,7 @@ import AccountStorage from '../../utils/account_storage';
 export interface FetchParams<TResult> {
   onSuccess?: (data: TResult | null) => void;
   onError?: (error: string) => void;
+  defaultData?: TResult | null;
 }
 
 export interface UseFetchParams<TResult> extends FetchParams<TResult> {
@@ -21,23 +22,24 @@ export type UseFetchResult<TBody, TResult> = {
   data?: TResult | null,
   isLoading: boolean,
   error: string | null,
-  fetchData: (body: TBody) => Promise<void>,
+  fetchData: (body?: TBody | null) => Promise<void>,
 };
 
 function useFetch<TBody, TResult>(
   {
     fetchRequestConfig,
+    defaultData = null,
     onSuccess,
     onError,
   }: UseFetchParams<TResult>,
 ): UseFetchResult<TBody, TResult> {
-  const [data, setData] = useState<TResult | null>();
+  const [data, setData] = useState<TResult | null>(defaultData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
-  const fetchData = async (body: TBody): Promise<void> => {
+  const fetchData = async (body: TBody | null = null): Promise<void> => {
     const accountTokens = await getAccountTokens();
 
     if (fetchRequestConfig.isAuthRequired && !accountTokens) {
@@ -49,23 +51,20 @@ function useFetch<TBody, TResult>(
 
     const fetchApi = new FetchApi<TBody, TResult>(fetchRequestConfig, accountTokens, body);
 
-    if (onSuccess) {
-      fetchApi.addEventListenerOnSuccess((response: TResult) => {
-        if (onSuccess) {
-          onSuccess(response);
-        }
-        setData(response);
-      });
-    }
+    fetchApi.addEventListenerOnSuccess((response: TResult) => {
+      if (onSuccess) {
+        onSuccess(response);
+      }
 
-    if (onError) {
-      fetchApi.addEventListenerOnError((error: string) => {
-        if (onError) {
-          onError(error);
-        }
-        setError(error);
-      });
-    }
+      setData(response);
+    });
+
+    fetchApi.addEventListenerOnError((error: string) => {
+      if (onError) {
+        onError(error);
+      }
+      setError(error);
+    });
 
     fetchApi.addEventListenerOnFinish(() => {
       setIsLoading(false);
