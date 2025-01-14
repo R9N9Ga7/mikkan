@@ -20,6 +20,7 @@ const AddItemModal: FC<AddItemModalProps> = ({ isOpen, onHide }) => {
   const { error, fetchData, isLoading } = useFetchVaultAddItem({
     onSuccess: () => {
       setVaultItem(createEmptyVaultItem());
+      onHide();
     },
   });
 

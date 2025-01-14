@@ -7,3 +7,5 @@ export const ACCOUNT_REFRESH_TOKENS_URL = `${ACCOUNT_URL}/refresh`;
 
 export const VAULT_URL = `${BASE_URL}/vault`;
 export const VAULT_ADD_ITEM_URL = VAULT_URL;
+export const VAULT_GET_ALL_ITEMS_URL = VAULT_URL;
+export const VAULT_GET_ITEM_URL = VAULT_URL;
