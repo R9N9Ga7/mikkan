@@ -51,7 +51,7 @@ function useFetch<TBody, TResult>(
 
     const fetchApi = new FetchApi<TBody, TResult>(fetchRequestConfig, accountTokens, body);
 
-    fetchApi.addEventListenerOnSuccess((response: TResult) => {
+    fetchApi.addEventListenerOnSuccess((response: TResult | null) => {
       if (onSuccess) {
         onSuccess(response);
       }

@@ -1,7 +1,7 @@
 import { Account } from '../interfaces/account';
 import { FetchRequestConfig } from './fetch_request_config';
 
-type FetchApiSuccessEventCb<TResponse> = (data: TResponse) => void;
+type FetchApiSuccessEventCb<TResponse> = (data: TResponse | null) => void;
 type FetchApiErrorEventCb = (error: string) => void;
 type FetchApiFinishEventCb = () => void;
 type FetchApiRequestBodyType<TBody> = TBody | null;
@@ -69,7 +69,7 @@ export class FetchApi<TBody, TResponse> {
     return headers;
   };
 
-  private onSuccess(response: TResponse): void {
+  private onSuccess(response: TResponse | null): void {
     this.successCbs.forEach(cb => {
       cb(response);
     });
@@ -95,9 +95,7 @@ export class FetchApi<TBody, TResponse> {
         // TODO: Fix later (when will be more consistent response from server)
       }
 
-      if (this.responseData) {
-        this.onSuccess(this.responseData);
-      }
+      this.onSuccess(this.responseData);
     } else {
       const errorMessage = await response.text();
       this.onError(errorMessage);
