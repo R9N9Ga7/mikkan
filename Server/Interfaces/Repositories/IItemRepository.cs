@@ -9,4 +9,5 @@ public interface IItemRepository
     public Task<bool> IsExists(Guid id);
     public Task<Item?> GetById(Guid id);
     public Task Remove(Item item);
+    public Task<Item> Edit(Item item);
 }

@@ -18,5 +18,7 @@ public class MapperProfile : Profile
 
         CreateMap<AddItemRequest, Item>();
         CreateMap<Item, ItemResponse>();
+
+        CreateMap<EditItemRequest, Item>();
     }
 }

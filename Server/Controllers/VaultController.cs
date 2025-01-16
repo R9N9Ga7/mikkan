@@ -99,6 +99,27 @@ public class VaultController(IItemService itemService, IMapper mapper) : Control
         }
     }
 
+    [HttpPut]
+    [Authorize]
+    public async Task<IResult> EditItem(EditItemRequest itemRequest)
+    {
+        try
+        {
+            var userId = GetUserId();
+            var item = _mapper.Map<Item>(itemRequest);
+            await _itemService.Edit(item, userId);
+            return Results.Ok();
+        }
+        catch (ItemNotFoundException)
+        {
+            return Results.NotFound();
+        }
+        catch (UserUnauthorizedException)
+        {
+            return Results.Unauthorized();
+        }
+    }
+
     Guid GetUserId()
     {
         var nameIdentifierClaim = User?.FindFirst(ClaimTypes.NameIdentifier)

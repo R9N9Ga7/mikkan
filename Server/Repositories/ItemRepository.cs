@@ -39,5 +39,13 @@ public class ItemRepository(DatabaseContext databaseContext) : IItemRepository
         await _databaseContext.SaveChangesAsync();
     }
 
+    public async Task<Item> Edit(Item item)
+    {
+        _databaseContext.Items.Update(item);
+        await _databaseContext.SaveChangesAsync();
+
+        return item;
+    }
+
     readonly DatabaseContext _databaseContext = databaseContext;
 }

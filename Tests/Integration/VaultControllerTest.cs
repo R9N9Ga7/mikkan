@@ -146,9 +146,36 @@ public class VaultControllerTest : IntegrationTestBase
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
+    [Fact]
+    public async Task EditItemWithValidData()
+    {
+        var itemRequest = ItemData.CreateAddItemRequest();
+
+        var response = await Post(UrlAddItem, itemRequest);
+        response.EnsureSuccessStatusCode();
+
+        var content = await DeserializeResponse<Item>(response);
+        content.Should().NotBeNull();
+
+        content.Name = "Edited name";
+        content.Password = "Edited password";
+        content.Login = "Edited login";
+
+        var editResponse = await Put(UrlEditItem, content);
+        editResponse.EnsureSuccessStatusCode();
+
+        var findedItem = await _itemRepository.GetById(content.Id);
+        findedItem.Should().NotBeNull();
+
+        findedItem?.Name.Should().Be(content.Name);
+        findedItem?.Password.Should().Be(content.Password);
+        findedItem?.Login.Should().Be(content.Login);
+    }
+
     const string Url = "api/vault";
     const string UrlAddItem = Url;
     const string UrlRemoveItem = Url;
+    const string UrlEditItem = Url;
 
     readonly IItemRepository _itemRepository;
     readonly IItemService _itemService;

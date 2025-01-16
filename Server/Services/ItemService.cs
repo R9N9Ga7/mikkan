@@ -36,5 +36,17 @@ public class ItemService(IItemRepository itemRepository) : IItemService
         await _itemRepository.Remove(item);
     }
 
+    public async Task<Item> Edit(Item item, Guid userId)
+    {
+        var findedItem = await GetById(userId, item.Id);
+
+        findedItem.Name = item.Name;
+        findedItem.Login = item.Login;
+        findedItem.Password = item.Password;
+
+        var editedItem = await _itemRepository.Edit(findedItem);
+        return editedItem;
+    }
+
     readonly IItemRepository _itemRepository = itemRepository;
 }
