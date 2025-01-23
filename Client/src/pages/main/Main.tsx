@@ -3,7 +3,7 @@ import { Alert, Button, ListGroup } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import useFetchVaultGetAllItems from '../../hooks/api/useFetchVaultGetAllItems';
 import { SHOW_ITEM_PARAM_FULL_URL } from '../../common/consts/pages_urls';
-import { Bucket, PencilSquare } from 'react-bootstrap-icons';
+import { Bucket } from 'react-bootstrap-icons';
 import RemoveItemModal from '../../modals/remove_item/RemoveItemModal';
 import { VaultAllItemsResponse } from '../../api/interfaces/vault';
 
@@ -63,9 +63,6 @@ const Main: FC = () => {
                   onClick={(event) => handleOnItemRemove(event, item)}
                 >
                   <Bucket></Bucket>
-                </Button>
-                <Button variant="outline-secondary">
-                  <PencilSquare></PencilSquare>
                 </Button>
               </div>
             </ListGroup.Item>
