@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { FetchRequestConfig, FetchApi } from '../../common/fetch_api';
 import { AccountValidator } from '../../utils/account_validator';
 import { AccountRefreshTokensRequest, AccountRefreshTokensResponse } from '../../api/interfaces/account';
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { LOGIN_FULL_URL } from '../../common/consts/pages_urls';
 import AccountRequestConfigFactory from '../../api/request_config_factories/account_request_config_factory';
 import AccountStorage from '../../utils/account_storage';
+import NotificationContext, { INotificationContext, INotification } from '../../contexts/NotificationContext';
 
 export interface FetchParams<TResult> {
   onSuccess?: (data: TResult | null) => void;
@@ -16,6 +17,7 @@ export interface FetchParams<TResult> {
 
 export interface UseFetchParams<TResult> extends FetchParams<TResult> {
   fetchRequestConfig: FetchRequestConfig,
+  successMessage?: string,
 };
 
 export type UseFetchResult<TBody, TResult> = {
@@ -31,11 +33,14 @@ function useFetch<TBody, TResult>(
     defaultData = null,
     onSuccess,
     onError,
+    successMessage,
   }: UseFetchParams<TResult>,
 ): UseFetchResult<TBody, TResult> {
   const [data, setData] = useState<TResult | null>(defaultData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { notifications, setNotifications } = useContext<INotificationContext>(NotificationContext);
 
   const navigate = useNavigate();
 
@@ -57,6 +62,14 @@ function useFetch<TBody, TResult>(
       }
 
       setData(response);
+
+      if (successMessage) {
+        const notification: INotification = {
+          message: successMessage,
+        };
+
+        setNotifications([...notifications, notification]);
+      }
     });
 
     fetchApi.addEventListenerOnError((error: string) => {
@@ -64,6 +77,12 @@ function useFetch<TBody, TResult>(
         onError(error);
       }
       setError(error);
+
+      const notification: INotification = {
+        message: error,
+      };
+
+      setNotifications([...notifications, notification]);
     });
 
     fetchApi.addEventListenerOnFinish(() => {

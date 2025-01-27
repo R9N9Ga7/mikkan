@@ -6,6 +6,7 @@ import Header from './Header';
 import AddItemModal from '../../modals/add_item/AddItemModal';
 import { MAIN_PAGE_URL } from '../../common/consts/pages_urls';
 import ShowItemModal from '../../modals/show_item/ShowItemModal';
+import NotificationsContainer from './notifications/NotificationsContainer';
 
 const MainLayout: FC = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const MainLayout: FC = () => {
         isOpen={!!searchParams.get('show-item')}
         onHide={() => navigate(MAIN_PAGE_URL)}
       />
+      <NotificationsContainer />
       <Container className="my-3">
         <Outlet />
       </Container>

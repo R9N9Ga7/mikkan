@@ -5,7 +5,11 @@ import useFetch, { FetchParams, UseFetchResult } from '../fetch/useFetch';
 const useFetchVaultEditItem = (params: FetchParams<null>)
 : UseFetchResult<EditVaultItemRequest, null> => {
   const fetchRequestConfig = VaultRequestConfigFactory.createEditItemConfig();
-  return useFetch<EditVaultItemRequest, null>({ fetchRequestConfig, ...params });
+  return useFetch<EditVaultItemRequest, null>({
+    fetchRequestConfig,
+    successMessage: 'The item has been updated.',
+    ...params,
+  });
 };
 
 export default useFetchVaultEditItem;
