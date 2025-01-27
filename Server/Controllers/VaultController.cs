@@ -13,10 +13,10 @@ namespace Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class VaultController(IItemService itemService, IMapper mapper) : ControllerBase
 {
     [HttpPost]
-    [Authorize]
     public async Task<IResult> AddItem(AddItemRequest vaultAddItemRequest)
     {
         try
@@ -42,7 +42,6 @@ public class VaultController(IItemService itemService, IMapper mapper) : Control
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<IResult> GetItems()
     {
         try
@@ -58,7 +57,6 @@ public class VaultController(IItemService itemService, IMapper mapper) : Control
         }
     }
 
-    [Authorize]
     [HttpGet("{itemId}")]
     public async Task<IResult> GetItemById(Guid itemId)
     {
@@ -79,7 +77,6 @@ public class VaultController(IItemService itemService, IMapper mapper) : Control
         }
     }
 
-    [Authorize]
     [HttpDelete("{itemId}")]
     public async Task<IResult> RemoveItemById(Guid itemId)
     {
@@ -100,7 +97,6 @@ public class VaultController(IItemService itemService, IMapper mapper) : Control
     }
 
     [HttpPut]
-    [Authorize]
     public async Task<IResult> EditItem(EditItemRequest itemRequest)
     {
         try
