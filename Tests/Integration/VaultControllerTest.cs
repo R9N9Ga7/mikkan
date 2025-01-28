@@ -4,6 +4,7 @@ using Server.Interfaces.Services;
 using Server.Models.Entities;
 using Server.Models.Requests;
 using Server.Models.Responses;
+using Server.Services;
 using System.Net;
 using Tests.Common;
 using Tests.Data;
@@ -36,10 +37,10 @@ public class VaultControllerTest : IntegrationTestBase
 
         content.Should().BeEquivalentTo(itemRequest);
 
-        var findedItem = await _itemRepository.GetById(content.Id);
-        findedItem.Should().NotBeNull();
-
         var user = await GetTestUser();
+        var findedItem = await _itemService.GetById(user.Id, content.Id);
+
+        findedItem.Should().NotBeNull();
         findedItem?.UserId.Should().Be(user.Id);
     }
 
@@ -164,7 +165,8 @@ public class VaultControllerTest : IntegrationTestBase
         var editResponse = await Put(UrlEditItem, content);
         editResponse.EnsureSuccessStatusCode();
 
-        var findedItem = await _itemRepository.GetById(content.Id);
+        var user = await GetTestUser();
+        var findedItem = await _itemService.GetById(user.Id, content.Id);
         findedItem.Should().NotBeNull();
 
         findedItem?.Name.Should().Be(content.Name);

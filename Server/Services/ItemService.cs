@@ -5,14 +5,17 @@ using Server.Models.Entities;
 
 namespace Server.Services;
 
-public class ItemService(IItemRepository itemRepository) : IItemService
+public class ItemService(IItemRepository itemRepository, IPasswordEncryptionService passwordEncryptionService) : IItemService
 {
     public async Task<Item> Create(Item item, Guid userId)
     {
         item.UserId = userId;
         item.CreatedAt = DateTime.UtcNow;
+        item.Password = _passwordEncryptionService.Encrypt(item.Password);
 
         await _itemRepository.Create(item);
+
+        item.Password = _passwordEncryptionService.Decrypt(item.Password);
 
         return item;
     }
@@ -20,14 +23,27 @@ public class ItemService(IItemRepository itemRepository) : IItemService
     public async Task<IEnumerable<Item>> GetAllByUserId(Guid userId)
     {
         var items = await _itemRepository.GetAllByUserId(userId);
+
+        foreach (var item in items)
+        {
+            item.Password = _passwordEncryptionService.Decrypt(item.Password);
+        }
+
         return items;
     }
 
     public async Task<Item> GetById(Guid userId, Guid itemId)
     {
         var item = await _itemRepository.GetById(itemId) ?? throw new ItemNotFoundException();
-        return item.UserId == userId
-            ? item : throw new UserUnauthorizedException();
+
+        if (item.UserId != userId)
+        {
+            throw new UserUnauthorizedException();
+        }
+
+        item.Password = _passwordEncryptionService.Decrypt(item.Password);
+
+        return item;
     }
 
     public async Task RemoveById(Guid userId, Guid itemId)
@@ -42,11 +58,12 @@ public class ItemService(IItemRepository itemRepository) : IItemService
 
         findedItem.Name = item.Name;
         findedItem.Login = item.Login;
-        findedItem.Password = item.Password;
+        findedItem.Password = _passwordEncryptionService.Encrypt(item.Password);
 
         var editedItem = await _itemRepository.Edit(findedItem);
         return editedItem;
     }
 
     readonly IItemRepository _itemRepository = itemRepository;
+    readonly IPasswordEncryptionService _passwordEncryptionService = passwordEncryptionService;
 }

@@ -72,6 +72,7 @@ public class Program
 
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IItemService, ItemService>();
+        services.AddTransient<IPasswordEncryptionService, PasswordEncryptionService>();
 
         services.Configure<AccountSettings>(builder.Configuration.GetSection("AccountSettings"));
         services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
