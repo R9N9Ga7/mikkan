@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Server.Interfaces.Repositories;
 using Server.Interfaces.Services;
+using Server.Models;
 using Server.Models.Entities;
 using Server.Models.Requests;
 using Server.Models.Responses;
@@ -28,8 +29,11 @@ public class VaultControllerTest : IntegrationTestBase
 
         var response = await Post(UrlAddItem, itemRequest);
         response.EnsureSuccessStatusCode();
+        
+        var responseContent = await DeserializeResponse<Response<Item>>(response);
+        responseContent.Should().NotBeNull();
 
-        var content = await DeserializeResponse<Item>(response);
+        var content = responseContent.Content;
         content.Should().NotBeNull();
 
         var isExists = await _itemRepository.IsExists(content.Id);
@@ -67,7 +71,10 @@ public class VaultControllerTest : IntegrationTestBase
         var response = await Get($"{UrlAddItem}/{createdItem.Id}");
         response.EnsureSuccessStatusCode();
 
-        var content = await DeserializeResponse<ItemResponse>(response);
+        var responseContent = await DeserializeResponse<Response<ItemResponse>>(response);
+        responseContent.Should().NotBeNull();
+
+        var content = responseContent.Content;
         content.Should().NotBeNull();
 
         content.Name.Should().BeEquivalentTo(item.Name);
@@ -155,7 +162,10 @@ public class VaultControllerTest : IntegrationTestBase
         var response = await Post(UrlAddItem, itemRequest);
         response.EnsureSuccessStatusCode();
 
-        var content = await DeserializeResponse<Item>(response);
+        var responseContent = await DeserializeResponse<Response<Item>>(response);
+        responseContent.Should().NotBeNull();
+
+        var content = responseContent.Content;
         content.Should().NotBeNull();
 
         content.Name = "Edited name";

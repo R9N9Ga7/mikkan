@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Server.Interfaces.Repositories;
 using Server.Interfaces.Services;
+using Server.Models;
 using Server.Models.Requests;
 using Server.Models.Responses;
 using Server.Settings;
@@ -146,7 +147,10 @@ public class AccountControllerTest : IntegrationTestBase
         var loginResponse = await Post(UrlLogin, userCreateRequest, false);
         loginResponse.EnsureSuccessStatusCode();
 
-        var loginContent = await DeserializeResponse<UserTokensResponse>(loginResponse);
+        var loginResponseContent = await DeserializeResponse<Response<UserTokensResponse>>(loginResponse);
+        loginResponseContent.Should().NotBeNull();
+
+        var loginContent = loginResponseContent.Content;
         loginContent.Should().NotBeNull();
         loginContent.AccessToken.Should().NotBeEmpty();
         loginContent.RefreshToken.Should().NotBeEmpty();
@@ -180,7 +184,10 @@ public class AccountControllerTest : IntegrationTestBase
         var loginResponse = await Post(UrlLogin, userCreateRequest, false);
         loginResponse.EnsureSuccessStatusCode();
 
-        var loginContent = await DeserializeResponse<UserTokensResponse>(loginResponse);
+        var loginResponseContent = await DeserializeResponse<Response<UserTokensResponse>>(loginResponse);
+        loginResponseContent.Should().NotBeNull();
+
+        var loginContent = loginResponseContent.Content;
         loginContent.Should().NotBeNull();
         loginContent.AccessToken.Should().NotBeEmpty();
         loginContent.RefreshToken.Should().NotBeEmpty();
@@ -188,7 +195,10 @@ public class AccountControllerTest : IntegrationTestBase
         var refreshTokensResponse = await Post(UrlRefresh, loginContent, false);
         refreshTokensResponse.EnsureSuccessStatusCode();
 
-        var refreshTokensContent = await DeserializeResponse<UserTokensResponse>(refreshTokensResponse);
+        var refreshTokensResponseContent = await DeserializeResponse<Response<UserTokensResponse>>(refreshTokensResponse);
+        refreshTokensResponseContent.Should().NotBeNull();
+
+        var refreshTokensContent = refreshTokensResponseContent.Content;
         refreshTokensContent.Should().NotBeNull();
 
         var refreshTokenValidationResult = await _tokenService.ValidateToken(refreshTokensContent.RefreshToken);
