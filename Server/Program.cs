@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.Contexts;
 using Server.Interfaces.Repositories;
 using Server.Interfaces.Services;
 using Server.Mappers;
+using Server.Middlewares;
 using Server.Repositories;
 using Server.Services;
 using Server.Settings;
 
 namespace Server;
-
 public class Program
 {
     public static void Main(string[] args)
@@ -26,8 +27,6 @@ public class Program
     static void ConfigServices(WebApplicationBuilder builder)
     {
         var services = builder.Services;
-
-        services.AddControllers();
 
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
@@ -62,6 +61,18 @@ public class Program
             options.UseSqlite(connectionString);
         });
 
+        services.AddControllers().ConfigureApiBehaviorOptions(options =>
+        {
+            options.InvalidModelStateResponseFactory = context =>
+            {
+                var modelStateEntry = context.ModelState.Values.FirstOrDefault();
+                var modelError = modelStateEntry?.Errors.FirstOrDefault();
+                var errorMessage = modelError?.ErrorMessage ?? "";
+
+                return new BadRequestObjectResult(errorMessage);
+            };
+        });
+
         services.AddAutoMapper(typeof(MapperProfile));
 
         services.AddTransient<IUserRepository, UserRepository>();
@@ -90,6 +101,8 @@ public class Program
             app.UseDeveloperExceptionPage();
             app.UseCors(DevCorsPolicyName);
         }
+
+        app.UseMiddleware<ResponseFormatMiddleware>();
     }
 
     const string DevCorsPolicyName = "AllowAll";
