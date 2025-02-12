@@ -1,4 +1,5 @@
 import { Account } from '../interfaces/account';
+import ServerResponse from '../interfaces/server_response';
 import { FetchRequestConfig } from './fetch_request_config';
 
 type FetchApiSuccessEventCb<TResponse> = (data: TResponse | null) => void;
@@ -88,17 +89,16 @@ export class FetchApi<TBody, TResponse> {
   }
 
   private async parseResponse(response: Response): Promise<void> {
-    if (response.ok) {
-      try {
-        this.responseData = await response.json();
-      } catch {
-        // TODO: Fix later (when will be more consistent response from server)
+    try {
+      const responseContent = await response.json() as ServerResponse<TResponse>;
+      if (response.ok) {
+        this.responseData = responseContent.content;
+        this.onSuccess(this.responseData);
+      } else {
+        this.onError(responseContent.message);
       }
-
-      this.onSuccess(this.responseData);
-    } else {
-      const errorMessage = await response.text();
-      this.onError(errorMessage);
+    } catch {
+      this.onError('Internal error');
     }
   }
 
