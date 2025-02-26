@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Server.Contexts;
+using Server.Extensions;
 using Server.Interfaces.Repositories;
 using Server.Interfaces.Services;
 using Server.Mappers;
@@ -73,6 +74,11 @@ public class Program
             };
         });
 
+        services.AddLogging(config =>
+        {
+            config.AddDebug();
+        });
+
         services.AddAutoMapper(typeof(MapperProfile));
 
         services.AddTransient<IUserRepository, UserRepository>();
@@ -87,6 +93,9 @@ public class Program
 
         services.Configure<AccountSettings>(builder.Configuration.GetSection("AccountSettings"));
         services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
+
+        var logsPath = Path.Combine(Directory.GetCurrentDirectory(), "logger.log");
+        builder.Logging.AddFile(logsPath);
     }
 
     static void ConfigApp(WebApplication app)
